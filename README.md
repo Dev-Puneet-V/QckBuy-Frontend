@@ -1,2 +1,1 @@
-# QckBuy-Frontend
-Client side of QckBuy
+# Frontend of QckBuy
