@@ -1,0 +1,22 @@
+enum STATUS {
+    NOT_STARTED,
+    PROCESSING,
+    SUCCESS,
+    FAILED
+}
+enum REQUEST_TYPE {
+    POST,
+    PATCH,
+    GET,
+    DELETE
+}
+enum TABLE_COLUMN_TYPE {
+    BUTTON,
+    TEXT
+}
+
+export {
+    STATUS,
+    REQUEST_TYPE,
+    TABLE_COLUMN_TYPE
+}
