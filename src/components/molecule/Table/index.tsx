@@ -4,7 +4,7 @@ import {
 } from "@mui/material";
 import TableBody from '../TableBody';
 import TableHead from '../TableHead';
-interface TablePropsType {
+export interface TablePropsType {
     columns: {
         name: string 
     }[]

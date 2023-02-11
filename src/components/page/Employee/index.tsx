@@ -1,294 +1,132 @@
 import * as React from 'react';
-import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import CssBaseline from '@mui/material/CssBaseline';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import { ThemeProvider } from '@mui/material/styles';
-import { Card } from '@mui/material';
-import {darkTheme} from '../../../theme';
-import { VictoryPie, VictoryChart, VictoryTheme, VictoryLine} from 'victory';
-import TableContainerEx from '../../molecule/TableContainer';
-import { 
-    Table,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper, Button
+import { VictoryPie, VictoryChart, VictoryLine} from 'victory';
+import TableContainer from '../../molecule/TableContainer';
+import Dashboard from '../../organism/Dashboard';
+import {  
+    Button, Box, Card, Typography, TextField, InputAdornment
 } from "@mui/material";
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import { 
-} from "@mui/icons-material";
+import { CloseOutlined, AccountCircleOutlined, DomainVerificationOutlined, EventAvailableOutlined, HistoryOutlined } from "@mui/icons-material";
 import moment from 'moment/moment.js';
-const drawerWidth = 240;
-
-const openedMixin = (theme: Theme): CSSObject => ({
-  width: drawerWidth,
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: 'hidden',
-});
-
-const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
-});
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-}));
-
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
+import { REQUEST_TYPE, request, isNumeric,} from '../../../hooks';
+import { TablePropsType } from '../../molecule/Table';
+import Modal from '../../molecule/Modal';
+import { STATUS } from '../../../type';
+const Component = (props: any) => {
+  const [historyData, setHistoryData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
+  const [availableOrdersData, setAvailableOrdersData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
+  const [acceptedOrdersData, setAcceptedOrdersData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
+  const [otpModalVerificationState, setOtpModalVerificationState] = React.useState<boolean>(false);
+  const [otp, setOtp] = React.useState<string>("");
+  const [otpVerifcationState, setOtpVerficationState] = React.useState<STATUS>(STATUS.NOT_STARTED);
+//   const []
+  const otpFieldRef = React.useRef<any>();
+  const [orderId, setOrderId] = React.useState<string | undefined>();
+  otpFieldRef.current = { value: '' };
+  const getData = async (url: string, index: number) => {
+    const data = await request(REQUEST_TYPE.GET, url, process.env.REACT_APP_EMPLOYEE_TOKEN)
+    if(data.success && data?.data && data?.data?.length > 0){
+        let columns: TablePropsType["columns"] = [];
+        Object.keys(data?.data[0]).forEach((key: string) => {
+            if(key === '_id'){
+                key = 'order_id';
+            }else if(key === 'updatedAt'){
+                if(index === 2){
+                    key = 'order_acceptance_date'
+                }
+                if(index === 3){
+                    key = 'order_delivery_date'
+                }
+            }
+            columns.push({
+                'name': key
+            });
+        });
+        const rows = data?.data?.map((currData: any, currIndex: number) => {
+            let currRow: TablePropsType["rows"][0] = [];
+            Object.keys(currData).forEach((key: any) => {
+                if(key.toString() === "createdAt" || key.toString() === "updatedAt"){
+                    currData[key] = moment(currData[key]).format("MMMM Do YYYY")
+                }
+                currRow.push({
+                    'value': currData[key]
+                });
+            });
+            if(index === 1){
+                currRow.push({
+                    'value': <Button variant="contained" color="secondary" onClick={() => { orderAcceptHandler(currData._id, currRow)}}>
+                                accept_order
+                            </Button>
+                })
+            }
+            if(index === 2){
+                currRow.push({
+                    'value': <Button variant="contained" color="secondary" onClick={
+                        () => deliveryHandler(currData._id, currRow)
+                    }>
+                                proceed_for_delivery
+                            </Button>
+                })
+            }
+            return currRow;
+        });
+        const newData = {
+            columns: columns,
+            rows: rows
+        };
+        if(index === 1){
+            columns.push({
+                'name': ''
+            });
+            setAvailableOrdersData(newData) ;  
+        }
+        if(index === 2){
+            columns.push({
+                'name': ''
+            });
+            setAcceptedOrdersData(newData); 
+        }
+        if(index === 3){
+            setHistoryData(newData);   
+        }
+    }
+}
+const orderAcceptHandler = async (orderId: string, currRow: any) => {
+    const data = await request(
+        REQUEST_TYPE.POST,
+        `http://localhost:4000/api/v1/order/accept/${orderId}`,
+        process.env.REACT_APP_EMPLOYEE_TOKEN
+    )
+    if(data.success){
+        setAvailableOrdersData(prevAvailableOrdersData => {
+            console.log(prevAvailableOrdersData)
+            let newRowList = [...prevAvailableOrdersData.rows].filter((row: any) => {
+                return row[0].value !== currRow[0].value
+            })
+            const newData ={
+                columns: prevAvailableOrdersData.columns,
+                rows: [...newRowList]
+            };
+            return newData;
+        });
+    }
 }
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
+const deliveryHandler = async (orderId: string,currRow: any) => {
+    const data = await request(
+        REQUEST_TYPE.GET,
+        `http://localhost:4000/api/v1/order/delivery/initiate/${orderId}`,
+        process.env.REACT_APP_EMPLOYEE_TOKEN
+    );
+    if(data.success){
+        setOrderId(orderId);
+        setOtpModalVerificationState(true);
+    }
+}
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
-  }),
-);
-
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-    },
-  }));
-  
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-    // hide last border
-    '&:last-child td, &:last-child th': {
-      border: 0,
-    },
-  }));
-  
-
-const StyledComponent = styled('div')({
-});
-function createData(
-    id: string,
-    initiation_date: string
-  ) {
-    return { id, initiation_date };
-  }
-  
-
-  const data = {
-    "columns": [
-      {
-        "name": "announcement_type",
-      },
-      {
-        "name": "announcement_by"
-      },
-      {
-          "name": ""
-      }
-    ],
-    "rows": [[
-      {
-        "value": "To be announced",
-      },
-      {
-        "value": "To be announced after 5",
-      },
-      {
-        "value": <Button variant="contained" color="secondary">
-                check
-            </Button> 
-      }
-    ],
-    [
-        {
-            "value": "To be announced",
-          },
-          {
-            "value": "To be announced after 5",
-          },
-          {
-            "value": <Button variant="contained" color="secondary">
-                check
-            </Button> 
-          }
-    ],
-    [
-        {
-          "value": "To be announced",
-        },
-        {
-          "value": "To be announced after 5",
-        },
-        {
-            "value": <Button variant="contained" color="secondary">
-            check
-        </Button> 
-        }
-      ],
-      [
-          {
-              "value": "To be announced",
-            },
-            {
-              "value": "To be announced after 5",
-            },
-            {
-                "value": <Button variant="contained" color="secondary" onClick={() => {console.log("Hello")}}>
-                check
-            </Button> 
-            }
-      ]
-    
-]
-  }
-
-export default function MiniDrawer() {
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const [selectedState, setSelectedState] = React.useState(0); 
-  const navList = ['Home', 'Available Orders', 'Accepted Orders', 'Offers', 'Announcements', 'History'];
-  const orders:any = []
-  for(let i = 0; i < 50; i++){
-    orders.push({
-        id: '63e2e2c44103efd4980dc76f',
-        initiation_date: moment(Date.now()).format("MMMM Do YYYY")
-      })
-  }
-  const rows = orders?.map((currOrder: any) => {
-    return createData(currOrder?.id, currOrder?.initiation_date);
-})
-  return (
-    <ThemeProvider theme={darkTheme}>
-        <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <AppBar position="fixed" open={open} >
-            <Toolbar>
-            <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                sx={{
-                marginRight: 5,
-                ...(open && { display: 'none' }),
-                }}
-            >
-                <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div" >
-                {navList[selectedState]}
-            </Typography>
-            </Toolbar>
-        </AppBar>
-        <Drawer variant="permanent" open={open} sx={{p: 0}}>
-            <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-            </IconButton>
-            </DrawerHeader>
-            <Divider sx={{}}/>
-            <List sx={{padding: '0px'}}>
-            {navList?.map((text, index) => (
-                <ListItem onClick={() => {setSelectedState(index)}} key={text} disablePadding sx={{ display: 'block' }} selected={selectedState === index}>
-                <ListItemButton
-                    sx={{
-                    minHeight: 48,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2.5,
-                    }}
-                >
-                    <ListItemIcon
-                    sx={{
-                        minWidth: 0,
-                        mr: open ? 3 : 'auto',
-                        justifyContent: 'center',
-                    }}
-                    >
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                    </ListItemIcon>
-                    <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                </ListItemButton>
-                </ListItem>
-            ))}
-            </List>
-        </Drawer>
-        <Box component="main" sx={{pt: 1, pb: 1, width: '100%'}}>
-            {/* <DrawerHeader /> */}
-        {selectedState === 0 &&    <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
-                <Card sx={{height : '300px', w: '300px', m: 5}}>
+    const ProfileComponent = (params: any) => {
+        return <>
+            <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
+                 <Card sx={{height : '300px', w: '300px', m: 5}}>
                 <VictoryPie
                     colorScale={["tomato", "orange", "gold", "cyan", "navy" ]}
                     data={[
@@ -334,137 +172,142 @@ export default function MiniDrawer() {
                     </VictoryChart>
                 </Card>
             </Box>
+        </>        
+    }
+    const AvailableOrdersComponent = (profileProps: any) => {
+        return <>
+            {availableOrdersData &&  <TableContainer columns={availableOrdersData?.columns} rows={availableOrdersData?.rows} /> }
+        </>        
+    }
+    const AcceptedOrdersComponent = (profileProps: any) => {
+        return <>
+            {acceptedOrdersData &&  <TableContainer columns={acceptedOrdersData?.columns} rows={acceptedOrdersData?.rows} /> }
+        </>        
+    }
+    const HistoryComponent = (profileProps: any) => {
+        return <>
+            {historyData &&  <TableContainer columns={historyData?.columns} rows={historyData?.rows} /> }
+        </>        
+    }
+
+    const profileFunction = () => {    
+    }
+    const availableOrdersFunction = () => {
+        getData('http://localhost:4000/api/v1/dashboard/employee/available-order', 1);     
+    }
+    const acceptedOrdersFunction = () => {
+        getData('http://localhost:4000/api/v1/dashboard/employee/accepted-order', 2);   
+    }
+    const historyFunction = () => {
+        getData('http://localhost:4000/api/v1/dashboard/employee/history', 3);       
+    }
+    const otpHandler = (e: React.SyntheticEvent) =>{
+        let target = e.target as HTMLInputElement;
+        if(!isNumeric(target.value) || target.value.length > 6){
+            target.value = target.value.substring(0, target.value.length - 1);
         }
-        {
-            selectedState === 1 && 
-            <Box>
-              <Card sx={{p: 2, m:2}}>
-                  <TableContainer component={Paper} sx={{width: '100%'}}>
-                      <Table sx={{ width: '100%' }} aria-label="customized table">
-                          <TableHead>
-                              <TableRow>
-                                  <StyledTableCell align="left">order_id</StyledTableCell>
-                                  <StyledTableCell align="left">order_initiation_Date</StyledTableCell>
-                                  <StyledTableCell align="center"></StyledTableCell>
-                              </TableRow>
-                          </TableHead>
-                          <TableBody sx={{height: '85vh', overyflowY: 'scroll'}}>
-                              {rows.map((row: any) => (
-                                  <StyledTableRow key={row.id}>
-                                      <StyledTableCell    align="left">{row.id}</StyledTableCell>
-                                      <StyledTableCell    align="left">{row.initiation_date}</StyledTableCell>
-                                      <StyledTableCell     align="right">
-                                          <Button variant="contained" color="secondary">
-                                              accept_order
-                                          </Button>
-                                      </StyledTableCell>
-                                  </StyledTableRow>
-                              ))}
-                          </TableBody>
-                      </Table>
-                  </TableContainer>
-                  </Card>
-            </Box>
+        setOtp(target.value)
+    }
+    const otpSubmitHandler = async () => {
+        setOtpVerficationState(STATUS.PROCESSING);
+        console.log(otp, 'otp')
+        const data = await request(
+            REQUEST_TYPE.POST,
+            `http://localhost:4000/api/v1/order/delivery/proceed/${orderId}`,
+            process.env.REACT_APP_EMPLOYEE_TOKEN,
+            {
+                "otp": otp
+            }
+        )
+        setOtpVerficationState(data.success ? STATUS.SUCCESS : STATUS.FAILED);
+        if(data.success){
+            setAcceptedOrdersData((prevAcceptedeOrdersData: any) => {
+                let newRowList = [...prevAcceptedeOrdersData.rows].filter((row: any) => {
+                    return row[0].value !== orderId
+                })
+                const newData ={
+                    columns: prevAcceptedeOrdersData.columns,
+                    rows: [...newRowList]
+                };
+                reinitializerOTPHandler()
+                return newData;
+            });
         }
-        {
-            selectedState === 2 && 
-            <Box>
-              <Card sx={{p: 2, m:2}}>
-                  <TableContainer component={Paper} sx={{width: '100%'}}>
-                      <Table sx={{ width: '100%' }} aria-label="customized table">
-                          <TableHead>
-                              <TableRow>
-                                  <StyledTableCell align="left">order_id</StyledTableCell>
-                                  <StyledTableCell align="left">order_acceptance_date</StyledTableCell>
-                                  <StyledTableCell align="center"></StyledTableCell>
-                                  </TableRow>
-                          </TableHead>
-                          <TableBody sx={{height: '85vh', overyflowY: 'scroll'}}>
-                              {rows.map((row: any) => (
-                                  <StyledTableRow key={row.id}>
-                                      <StyledTableCell    align="left">{row.id}</StyledTableCell>
-                                      <StyledTableCell    align="left">{row.initiation_date}</StyledTableCell>
-                                      <StyledTableCell     align="right">
-                                          <Button variant="contained" color="secondary">
-                                              Proceed_For_Delivery
-                                          </Button>
-                                      </StyledTableCell>
-                                  </StyledTableRow>
-                              ))}
-                          </TableBody>
-                      </Table>
-                  </TableContainer>
-                  </Card>
-            </Box>
-        }
-        {
-            selectedState === 3 && 
-            <Box>
-              <Card sx={{p: 2, m:2}}>
-                  <TableContainer component={Paper} sx={{width: '100%'}}>
-                      <Table sx={{ width: '100%' }} aria-label="customized table">
-                          <TableHead>
-                              <TableRow>
-                                  <StyledTableCell align="left">offer_type</StyledTableCell>
-                                  <StyledTableCell align="left">offer</StyledTableCell>
-                                  <StyledTableCell align="center"></StyledTableCell>
-                                  </TableRow>
-                          </TableHead>
-                          <TableBody sx={{height: '85vh', overyflowY: 'scroll'}}>
-                              {rows.map((row: any, index: number) => (
-                                  <StyledTableRow key={row.id}>
-                                      <StyledTableCell    align="left">{index % 2 === 0 ? "Holiday Package" : "discount"}</StyledTableCell>
-                                      <StyledTableCell    align="left">{index % 2 === 0 ? "3 days trip to himalaya" : "60% flat discount on smartphone"}</StyledTableCell>
-                                      <StyledTableCell    align="right">
-                                          <Button variant="contained" color="secondary">
-                                              checkout
-                                          </Button>
-                                      </StyledTableCell>
-                                  </StyledTableRow>
-                              ))}
-                          </TableBody>
-                      </Table>
-                  </TableContainer>
-                  </Card>
-            </Box>
-        }
-        {
-            selectedState === 4 && 
-            <Box>
-              <Card sx={{p: 2, m:2}}>
-                    <TableContainerEx columns={data.columns} rows={data.rows} />
-                </Card>
-            </Box>
-        }
-        {
-            selectedState === 5 && 
-            
-            <Box>
-              <Card sx={{p: 2, m:2}}>
+    }
+    function reinitializerOTPHandler(): void {
+            setOtpModalVerificationState(false);
+            setOtp("");
+            setOtpVerficationState(STATUS.NOT_STARTED);
+            setOrderId("");   
+    }
+
+  return (
+    <>
+        <Dashboard 
+            navList={['Profile', 'Available Orders', 'Accepted Orders', 'History']}
+            navIconList={[<AccountCircleOutlined />, <EventAvailableOutlined/>, <DomainVerificationOutlined />, <HistoryOutlined />]}
+            mainContentList={
+                [
+                    <ProfileComponent />,
+                    <AvailableOrdersComponent />,
+                    <AcceptedOrdersComponent />,
+                    <HistoryComponent />
+                ]
+            }
+            stateHandlerList={
+                [
+                    profileFunction,
+                    availableOrdersFunction,
+                    acceptedOrdersFunction,
+                    historyFunction
+                ]
+            }
+        />
+        <Modal open={otpModalVerificationState} handleClose={reinitializerOTPHandler}>
+            <Box
+                sx={{height: '250px', width: '390px', p: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'top', pointerEvents: otpVerifcationState === STATUS.PROCESSING ? 'none': ''}}
+            >
+                {/* <Typography variant="h4">
+                    OTP VERICATION
+                </Typography> */}
+                <Typography variant="subtitle1">
+                    <b>Please enter the otp sent on the order receipt email</b>
+                </Typography>
+                <TextField 
+                    sx={{
+                        mt: 1
+                    }}
+                    id="standard-basic" 
+                    label="OTP"
+                    variant="standard"
+                    onInput = {otpHandler}
+                    // onChange={otpHandler}
+                    inputRef={otpFieldRef}
+                    disabled={otpVerifcationState === STATUS.PROCESSING || otpVerifcationState === STATUS.SUCCESS}
+                />
+                <Button variant="contained" color="primary" sx={{mt: 5}} disabled={otp.length !== 6 || otpVerifcationState === STATUS.PROCESSING || otpVerifcationState === STATUS.SUCCESS} onClick={otpSubmitHandler}>
+                  {otpVerifcationState === STATUS.NOT_STARTED && 'Confirm OTP' }
+                  {otpVerifcationState === STATUS.PROCESSING && 'Processing' }
+                  {otpVerifcationState === STATUS.FAILED && 'Failed' }
+                  {otpVerifcationState === STATUS.SUCCESS && 'Success' }
+                </Button>
                 
-                  <TableContainer component={Paper} sx={{width: '100%'}}>
-                      <Table sx={{ width: '100%' }} aria-label="customized table">
-                          <TableHead>
-                              <TableRow>
-                                  <StyledTableCell align="left">order_id</StyledTableCell>
-                                  <StyledTableCell align="right">delivery_date</StyledTableCell>
-                                  </TableRow>
-                          </TableHead>
-                          <TableBody sx={{height: '85vh', overyflowY: 'scroll'}}>
-                              {rows.map((row: any) => (
-                                  <StyledTableRow key={row.id}>
-                                      <StyledTableCell    align="left">{row.id}</StyledTableCell>
-                                      <StyledTableCell    align="right">{row.initiation_date}</StyledTableCell>
-                                  </StyledTableRow>
-                              ))}
-                          </TableBody>
-                      </Table>
-                  </TableContainer>
-                  </Card>
+                <Button 
+                        variant="contained" 
+                        color="primary"
+                        onClick={reinitializerOTPHandler}
+                        sx={{
+                            width: '100px',
+                            margin: 'auto',
+                            mt: 1
+                        }}
+                    >
+                        close
+                    </Button>
             </Box>
-        }
-        </Box>
-        </Box>
-    </ThemeProvider>
+        </Modal>
+    </>
   );
 }
+
+export default Component;
