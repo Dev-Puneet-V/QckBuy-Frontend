@@ -210,7 +210,6 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
     }
     const otpSubmitHandler = async () => {
         setOtpVerficationState(STATUS.PROCESSING);
-        console.log(otp, 'otp')
         const data = await request(
             REQUEST_TYPE.POST,
             `http://localhost:4000/api/v1/order/delivery/proceed/${orderId}`,
@@ -267,9 +266,6 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
             <Box
                 sx={{height: '250px', width: '390px', p: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'top', pointerEvents: otpVerifcationState === STATUS.PROCESSING ? 'none': ''}}
             >
-                {/* <Typography variant="h4">
-                    OTP VERICATION
-                </Typography> */}
                 <Typography variant="subtitle1">
                     <b>Please enter the otp sent on the order receipt email</b>
                 </Typography>

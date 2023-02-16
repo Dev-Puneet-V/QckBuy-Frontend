@@ -39,7 +39,7 @@ const Component = (props: any) => {
         component="img"
         alt="green iguana"
         height="200"
-        image={props.product.photos[0].secure_url}
+        image={props.product?.photos[0]?.secure_url}
         onClick={() => {navigate(`product/${props.product?._id}`)}}
       />
       <CardContent>

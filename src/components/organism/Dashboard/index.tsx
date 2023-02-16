@@ -16,8 +16,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import { ThemeProvider } from '@mui/material/styles';
 import { Card } from '@mui/material';
 import {darkTheme} from '../../../theme';
@@ -92,6 +90,11 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
+interface HeaderContentType {
+  isVisible?: boolean;
+  content?: React.ReactNode;
+}
+
 interface DashboardPropsType {
     navList: string[];
     navIconList?: React.ReactNode[];
@@ -99,6 +102,7 @@ interface DashboardPropsType {
     stateHandlerList: ((...params: any) => void)[];
     //length should be same of stateHandleList to navList
     mainContentList: React.ReactNode[];
+    header?: HeaderContentType[];
 }
 
 const Component = (props: DashboardPropsType) => {
@@ -106,7 +110,8 @@ const Component = (props: DashboardPropsType) => {
         navList,
         navIconList,
         stateHandlerList,
-        mainContentList
+        mainContentList,
+        header
     } = props;
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -179,9 +184,13 @@ const Component = (props: DashboardPropsType) => {
             </List>
         </Drawer>
         <Box component="main" sx={{pt: 1, pb: 1, width: '100%'}}>
-            {/* <DrawerHeader /> */}
+            {header && header[selectedState] && header[selectedState]?.isVisible &&
+              <DrawerHeader>
+                { header[selectedState]?.content}
+              </DrawerHeader>
+              }
             <Box>
-              <Card sx={{p: 2, ml: 2, mr: 2, mt:2, height: '88vh'}}>
+              <Card sx={{p: 2, ml: 2, mr: 2, mt: header && header[selectedState] && header[selectedState]?.isVisible ? 0: 2, height: header && header[selectedState] && header[selectedState]?.isVisible ? '80vh' : '88vh'}}>
                     {mainContentList[selectedState]}
                 </Card>
             </Box>

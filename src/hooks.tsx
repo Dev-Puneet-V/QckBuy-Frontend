@@ -4,23 +4,40 @@ enum REQUEST_TYPE {
     POST,
     PATCH,
     GET,
-    DELETE
+    DELETE,
+    PUT
 }
 
+interface JSONDataType {
+    [key: string]: any;
+}
 
-const request = BigPromise(async (request_type: REQUEST_TYPE, request_url: URL, bearer_token?: String, bodyData?: Object) => {
-    console.log(bodyData, 'bodyData')
-    let response = await fetch(request_url, {
-        method: REQUEST_TYPE[request_type],
-        headers: {
-            Authorization: `Bearer ${bearer_token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bodyData)
+const request = BigPromise(async (request_type: REQUEST_TYPE, request_url: URL, bearer_token?: String, bodyData?: Object, fileData?: any ) => {
+    const formData = new FormData();
+    
+    if(fileData){
+      fileData.forEach((file: File, index: number) => {
+        formData.append(`photos`, file, file.name);
       });
-      let data = await response.json();
-      return data;
+    }
+    if(bodyData){
+      Object.keys(bodyData).forEach(function(key) {
+        formData.append(key, bodyData[key]);
+      });
+    }
+    const parameters = {
+      method: REQUEST_TYPE[request_type],
+      headers: {
+          Authorization: `Bearer ${bearer_token}`
+      }
+    }
+    if(request_type !== REQUEST_TYPE.GET){
+      parameters['body'] = formData;
+    }
+    
+    let response = await fetch(request_url, parameters);
+    let data = await response.json();
+    return data;
 });
 
 const updateCart = BigPromise(async (increment: boolean, productId: String, next: any) => {
@@ -52,11 +69,28 @@ function isDate(sDate: any) {
     return !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
   }
 
+function filterData(text: string, data: JSONDataType) {
+    const results: JSONDataType = {};
+
+  for (const key in data) {
+    if (typeof data[key] === 'object') {
+      const nestedResults = filterData(text, data[key] as JSONDataType);
+      if (Object.keys(nestedResults).length) {
+        results[key] = nestedResults;
+      }
+    } else if (typeof data[key] === 'string' && data[key].includes(text)) {
+      results[key] = data[key];
+    }
+  }
+  return results
+}
+
 export {
     updateCart,
     REQUEST_TYPE,
     request,
     deleteCart,
     isDate,
-    isNumeric
+    isNumeric,
+    filterData
 };
