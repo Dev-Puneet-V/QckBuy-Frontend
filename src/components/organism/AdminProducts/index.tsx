@@ -20,8 +20,7 @@ import {
 import Tabs from '../../molecule/Tabs'
 import AdminProductListItem from '../../molecule/AdminProductListItem';
 import StrictProductInfo from '../StrictProductInfo';
-import { request, REQUEST_TYPE } from "../../../hooks";
-
+import { filterData, request } from "../../../hooks";
 
 const tabData = [
     { 
@@ -40,9 +39,19 @@ const tabData = [
 
 const Component = (props: any) => {
     const {
-        productList, 
-        setProductList
+        productList,
+        childRef
     } = props;
+    
+    const [filteredProducts, setFilteredProducts] = React.useState<any>(productList);
+    React.useImperativeHandle(childRef, () => ({
+        productSearchHandler(event: React.SyntheticEvent) {
+            let target = event.target as HTMLInputElement;
+            let value = target.value;
+            const results =  filterData(value, productList);
+            setFilteredProducts(results);
+        }
+      }));
     const [currProduct, setCurrProduct] = React.useState<any>();
     const [currState, setCurrState] = React.useState(tabData[0].value);
     const handleState = (state:string) => {
@@ -67,7 +76,7 @@ const Component = (props: any) => {
     return (
         <>
             {
-                !productList && 
+                !filteredProducts && 
                 <Box sx={{
                     height: '100%', 
                     width: '100%', 
@@ -83,7 +92,7 @@ const Component = (props: any) => {
                 </Box>
             }
             {
-                productList && 
+                filteredProducts && 
                 <>
                 
                     <Box sx={{
@@ -94,8 +103,10 @@ const Component = (props: any) => {
                     alignItems: 'center',
                     flexDirection: 'column'
                 }}>
+                    {console.log(filteredProducts.length, 'length')}
                     {
-                        productList?.map((product: any) => {
+                       
+                       filteredProducts?.map((product: any) => {
                             return (
                                 <Card sx={{p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', m: 2}}>
                                     <Typography>
