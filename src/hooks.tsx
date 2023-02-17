@@ -69,20 +69,21 @@ function isDate(sDate: any) {
     return !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
   }
 
+      
+
 function filterData(text: string, data: JSONDataType) {
-    const results: JSONDataType = {};
+    const results: JSONDataType = [];
 
   for (const key in data) {
-    if (typeof data[key] === 'object') {
-      const nestedResults = filterData(text, data[key] as JSONDataType);
-      if (Object.keys(nestedResults).length) {
-        results[key] = nestedResults;
-      }
-    } else if (typeof data[key] === 'string' && data[key].includes(text)) {
-      results[key] = data[key];
+    if(JSON.stringify(data[key]).includes(text)){
+      results.push(data[key])
     }
   }
-  return results
+  return results;
+}
+
+function jsonToArray(jsonData: JSONDataType) {
+  return Object.keys(jsonData).map((key) => jsonData[key]);
 }
 
 export {
@@ -92,5 +93,6 @@ export {
     deleteCart,
     isDate,
     isNumeric,
-    filterData
+    filterData, 
+    jsonToArray
 };

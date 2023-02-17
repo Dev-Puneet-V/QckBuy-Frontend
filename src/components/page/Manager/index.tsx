@@ -15,7 +15,8 @@ import {
     Inventory2Outlined,
     BadgeOutlined,
     ManageAccountsOutlined,
-    AddOutlined
+    AddOutlined,
+    Refresh
 } from "@mui/icons-material";
 import { TablePropsType } from '../../molecule/Table';
 import { 
@@ -28,17 +29,16 @@ import { baseTheme} from '../../../theme';
 import { STATUS, REQUEST_TYPE } from "../../../type";
 import {
     Modal,
-    Search
+    Search,
 } from '../../molecule';
 import AdminProducts from '../../organism/AdminProducts';
 import { filterData, request } from "../../../hooks";
-import {
-    TableContainer,
-} from '../../molecule';
 import moment from 'moment/moment.js';
 const Component = (props: any) => {
+    const inputRef = React.useRef<{ productSearchHandler: (event: React.SyntheticEvent) => void }>();
     const [products, setProducts] = React.useState<any>([]);
-    const [fileredProducts, setFilteredProducts] = React.useState<any>();
+    const [employee, setEmployee] = React.useState<any>([]);
+    const [fileredProducts, setFilteredProducts] = React.useState<any>(products);
     const [state, setState] = React.useState<STATUS>(STATUS.NOT_STARTED);
     const [isProductAddModalVisible, setProductAddModalVisibility] = React.useState<boolean>(false);
     const {
@@ -55,7 +55,6 @@ const Component = (props: any) => {
         ).then(data => {
             if(data && data.success){
                 setProducts(data.products);
-                setFilteredProducts(data.products);
             }
         })
     }, []);
@@ -66,20 +65,23 @@ const Component = (props: any) => {
     }
 
     const ProductsComponent = () => {
-        return <Box sx={{display: 'flex', justifyContent: 'center', height: '100%', width: '100%',  overflowY: 'scroll', flexWrap: 'wrap'}}>
-            {/* {
-                products?.map((product: any) => {
-                    return <ThemeProvider theme={baseTheme}> */}
-                        <AdminProducts productList={products} setProductList={setProducts}/>
-                        {/* <Box sx={{m: 1}}><Card product={product} /></Box> */}
-                    {/* </ThemeProvider>
-                }) */}
-            {/* } */}
+        return <Box 
+            sx={{
+                display: 'flex', 
+                justifyContent: 'center', 
+                height: '100%', 
+                width: '100%',  
+                overflowY: 'scroll', 
+                flexWrap: 'wrap'
+            }}
+        >
+                <AdminProducts productList={products} childRef={inputRef}/>
         </Box>
     }
 
     const EmployeesComponent = () => {
         return <>
+            {/* <TableContainer columns={employeeProcessedData?.columns} rows={employeeProcessed?.rows} /> */}
         </>
     }
 
@@ -89,10 +91,7 @@ const Component = (props: any) => {
     }
 
     const productSearchHandler = (event: React.SyntheticEvent) =>{
-        let target = event.target as HTMLInputElement;
-        let value = target.value;
-        const results = filterData(value, fileredProducts);
-        setFilteredProducts(results);
+        inputRef?.current?.productSearchHandler(event);
     }
 
     const addProductHandler = async () => {
@@ -104,7 +103,7 @@ const Component = (props: any) => {
 
     const productHandler = (productData: any) => {
         const newProduct = productData;
-        setProducts([newProduct, ...products])
+        setProducts([...products, newProduct])
     }
 
     const AddProduct = () => {
