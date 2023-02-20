@@ -2,51 +2,36 @@ import * as React from "react";
 import { useForm } from 'react-hook-form';
 import {  
     Box,
-    Card,
-    Button,
-    IconButton,
-    Typography,
-    InputAdornment,
-    TextField,
-    TextFieldProps
+    Button
 } from "@mui/material";
 import { 
     AccountCircleOutlined,
     Inventory2Outlined,
     BadgeOutlined,
     ManageAccountsOutlined,
-    AddOutlined,
-    Refresh
+    AddOutlined
 } from "@mui/icons-material";
-import { TablePropsType } from '../../molecule/Table';
-import { 
-    styled 
-} from "@mui/system";
 import ProductForm from '../../molecule/ProductForm';
 import Dashboard from '../../organism/Dashboard';
-import { ThemeProvider } from '@mui/material/styles';
-import { baseTheme} from '../../../theme';
 import { STATUS, REQUEST_TYPE } from "../../../type";
 import {
     Modal,
     Search,
 } from '../../molecule';
-import AdminProducts from '../../organism/AdminProducts';
-import { filterData, request } from "../../../hooks";
-import moment from 'moment/moment.js';
+import AdminProducts from '../../organism/SecureProducts';
+import { request } from "../../../hooks";
+import SecureEmployee from '../../organism/SecureEmployee';
+import {
+    EmployeeState
+} from '../../../contexts/Employee';
 const Component = (props: any) => {
     const inputRef = React.useRef<{ productSearchHandler: (event: React.SyntheticEvent) => void }>();
     const [products, setProducts] = React.useState<any>([]);
-    const [employee, setEmployee] = React.useState<any>([]);
-    const [fileredProducts, setFilteredProducts] = React.useState<any>(products);
     const [state, setState] = React.useState<STATUS>(STATUS.NOT_STARTED);
     const [isProductAddModalVisible, setProductAddModalVisibility] = React.useState<boolean>(false);
     const {
-        register,
-        handleSubmit,
         formState: { errors },
       } = useForm();
-    console.log('rerendered')
     React.useEffect(() => {
         request(
             REQUEST_TYPE.GET,
@@ -81,12 +66,13 @@ const Component = (props: any) => {
 
     const EmployeesComponent = () => {
         return <>
-            {/* <TableContainer columns={employeeProcessedData?.columns} rows={employeeProcessed?.rows} /> */}
+            <SecureEmployee />
         </>
     }
 
     const ManagersComponent = () => {
         return <>
+            <SecureEmployee employeeType='manager'/>
         </>
     }
 
@@ -139,37 +125,37 @@ const Component = (props: any) => {
     };
 
     return (
-        <>
-        <Dashboard 
-            navList={['Profile', 'Products', 'Employees', 'Managers']}
-            navIconList={[<AccountCircleOutlined />, <Inventory2Outlined />, <BadgeOutlined />, <ManageAccountsOutlined />]}
-            mainContentList={
-                [
-                    <ProfileComponent />,
-                    <ProductsComponent />,
-                    <EmployeesComponent />,
-                    <ManagersComponent />
-                ]
-            }
-            stateHandlerList={
-                [
-                    () => {},
+        <EmployeeState>
+            <Dashboard 
+                navList={['Profile', 'Products', 'Employees', 'Managers']}
+                navIconList={[<AccountCircleOutlined />, <Inventory2Outlined />, <BadgeOutlined />, <ManageAccountsOutlined />]}
+                mainContentList={
+                    [
+                        <ProfileComponent />,
+                        <ProductsComponent />,
+                        <EmployeesComponent />,
+                        <ManagersComponent />
+                    ]
+                }
+                stateHandlerList={
+                    [
+                        () => {},
 
-                ]
-            }
-            header={[
-            {},
+                    ]
+                }
+                header={[
+                {},
+                {
+                    isVisible: true,
+                    content: <ProductHeaderComponent />
+                }]}
+            />
             {
-                isVisible: true,
-                content: <ProductHeaderComponent />
-            }]}
-        />
-        {
-            <Modal open={isProductAddModalVisible} 
-            handleClose={closeAddProductModal} 
-            children={<AddProduct />}/>
-        }
-        </>
+                <Modal open={isProductAddModalVisible} 
+                handleClose={closeAddProductModal} 
+                children={<AddProduct />}/>
+            }
+        </EmployeeState>
     )
 }
 

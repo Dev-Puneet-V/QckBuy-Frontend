@@ -39,10 +39,26 @@ type ProductType = {
     reviews: ReviewType[];
 }
 
+const EMPLOYEE_TAB_DATA = [
+    { 
+        'value': 'cu-employee',
+        'label': 'Current',
+    },
+    {
+        'value': 'jo-employee',
+        'label': 'Requests'
+    },
+    {
+        'value': 'ex-employee',
+        'label': 'Past'
+    }
+]
+
 export {
     STATUS,
     REQUEST_TYPE,
-    TABLE_COLUMN_TYPE
+    TABLE_COLUMN_TYPE,
+    EMPLOYEE_TAB_DATA
 };
 export type {
     ReviewType,

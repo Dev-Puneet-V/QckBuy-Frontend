@@ -10,7 +10,7 @@ const useStyles = makeStyles((themes) => ({
   [themes.breakpoints.down('sm')]: {
       tab: {
           fontSize: '13px',
-          width: '140px'
+          width: 'calc(100% / 3)'
       }
   },
 })); 
@@ -33,10 +33,10 @@ const TabsWrappedLabel = ({tabData, ...props}: Type) => {
     props.stateHandler(newValue);
   };
   return (
-    <Box sx={{ padding: '0px', borderColor: 'divider' }}>
+    <Box sx={{ padding: '0px', borderColor: 'divider', width: '100%' }}>
     {/* <ThemeProvider theme={tabTheme}> */}
       <Tabs
-      style={{display: 'flex', justifyContent: 'space-around'}}
+      style={{display: 'flex', justifyContent: 'space-around', width: '100%', marginBottom: '5px'}}
         value={value}
         onChange={handleChange}
         aria-label="wrapped label tabs example"
@@ -51,7 +51,7 @@ const TabsWrappedLabel = ({tabData, ...props}: Type) => {
                 value={currTab.value} 
                 label={currTab.label}  
                 data-testid={`tab-${currTab.value}`} 
-                sx={{width: '200px', fontSize: '16px', borderBottom: '2px solid #E1ECFC', alignItems: 'start'}}  
+                sx={{maxWidth:'calc(100% / 3)', width: `calc(100% / 3)` , fontSize: '16px', borderBottom: '2px solid #E1ECFC', alignItems: 'start'}}  
                 className={classes.tab}/>
             );
           })

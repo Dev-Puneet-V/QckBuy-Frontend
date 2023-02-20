@@ -103,7 +103,6 @@ const Component = (props: any) => {
                     alignItems: 'center',
                     flexDirection: 'column'
                 }}>
-                    {console.log(filteredProducts.length, 'length')}
                     {
                        
                        filteredProducts?.map((product: any) => {

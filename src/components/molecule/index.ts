@@ -9,5 +9,5 @@ export { default as TableContainer } from './TableContainer';
 export { default as TableRow } from './TableRow';
 export { default as TextIcon } from './TextIcon';
 export { default as AdminProduct } from './AdminProductListItem';
-
+export { default as AlertDialog } from './AlertDialog';
 

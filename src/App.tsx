@@ -7,7 +7,7 @@ import OrderConfirm from './components/page/OrderConfirm';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Payment from './components/page/Payment';
 import Employee from './components/page/Employee';
-import Manager from './components/page/Manager';
+import Manager from './components/page/Admin';
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
