@@ -183,7 +183,7 @@ const Component = (props: DashboardPropsType) => {
                 ))}
             </List>
         </Drawer>
-        <Box component="main" sx={{pt: 1, pb: 1, width: '100%'}}>
+        <Box component="main" sx={{pt: 1, pb: 1, width: '100%', mt: '55px'}}>
             {header && header[selectedState] && header[selectedState]?.isVisible &&
               <DrawerHeader>
                 { header[selectedState]?.content}

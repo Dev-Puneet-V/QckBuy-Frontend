@@ -10,6 +10,7 @@ import AlertDialog from '../AlertDialog';
 import { REQUEST_TYPE, request } from '../../../hooks';
 import { STATUS } from '../../../type';
 import ProcessingIndicator from '../ProcessingIndicator';
+import { useCookies } from 'react-cookie';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,6 +52,7 @@ const EmployeeCard = (props: any) => {
     employeeType,
     verifyEmployee
   } = props;
+  const [cookies] = useCookies(['token']);
   const { photo, _id, name, address, createdAt, email, applicationFor } = props.employee;
   const classes = useStyles();
   const [deletionConfirmationModalIsOpen, setDeletionConfirmationModalOpenStatus] = React.useState(false);
@@ -67,7 +69,7 @@ const EmployeeCard = (props: any) => {
     const data = await request(
         REQUEST_TYPE.PUT,
         `${process.env.REACT_APP_API_BASE_URL}/user/admin/user/${_id}`,
-        process.env.REACT_APP_ADMIN_TOKEN,
+        cookies.token,
         {
             role: 'ex-'+employeeType
         }
@@ -85,7 +87,7 @@ const EmployeeCard = (props: any) => {
     const data = await request(
         REQUEST_TYPE.PUT,
         `${process.env.REACT_APP_API_BASE_URL}/user/verify/${_id}`,
-        process.env.REACT_APP_ADMIN_TOKEN,
+        cookies.token,
         {
           conversionFor: applicationFor
         }

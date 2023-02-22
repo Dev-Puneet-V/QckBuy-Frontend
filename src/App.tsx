@@ -4,43 +4,57 @@ import Home from './components/page/Home';
 import Product from './components/page/Product';
 import Cart from './components/page/Cart';
 import OrderConfirm from './components/page/OrderConfirm';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {  Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Payment from './components/page/Payment';
 import Employee from './components/page/Employee';
-import Manager from './components/page/Admin';
+import Admin from './components/page/Admin';
+import Authentication from './components/organism/Authentication';
+import PrivateRoute from './components/molecule/PrivateRoute';
+import DefaultLayout from './components/template/DefaultLayout';
+import { useCookies } from 'react-cookie';
+interface AuthType {
+  isAuthenticated: boolean;
+  user?: any
+}
 function App() {
-  const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
   const [cart, setCart] = useState([]);
-  useEffect(() =>{
-    const processor = async () => {
-        let response = await fetch(`http://localhost:4000/api/v1/product/admin`, {
-          headers: {Authorization: `Bearer ${process.env.REACT_APP_ADMIN_TOKEN}`}
-        });
-        let data = await response.json();
-        setProducts(data.products);
+  const [cookies] = useCookies(['token']);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [auth, setAuth] = React.useState<AuthType>({isAuthenticated: cookies.token ? true : false}); 
+  const checkAuthentication = () => {
+    if(!cookies.token){
+      navigate('/login');
+      setAuth({isAuthenticated: false});
+    } else {
+      setAuth({ isAuthenticated: true });
     }
-    processor();
-  }, []);
+  };
+  useEffect(() =>{
+    checkAuthentication();
+  }, [cookies.token]);
 
   return (
     <div className="App">
-      <Header />
-      <BrowserRouter>
+      {/* <Header /> */}
         <Routes>
-            <Route path="/payment" element={<Payment cart={cart}/>} />
-            
-            <Route path="/products" element={products.length > 0 && <Home products={products}/>} />
-            
-            <Route path="/cart" element={<Cart
-            cart={cart} setCart={setCart}
-          />} />
-              <Route path="/product/:id" element={<Product
-          />} />
-            <Route path="/confirm" element={<OrderConfirm/>} />
-            <Route path="/employee" element={<Employee />} />
-            <Route path="/" element={<Manager />} />
+        <Route element={<PrivateRoute isAuthenticated={auth.isAuthenticated}/>}>
+          <Route element={<DefaultLayout />}>
+            <Route index element={<Home />} />
+            <Route path="product">
+              <Route path=":id" element={<Product />} />
+            </Route>
+            <Route path="payment" element={<Payment cart={cart}/>} />
+            <Route path="cart" element={<Cart cart={cart} setCart={setCart} />} />
+            <Route path="confirm" element={<OrderConfirm/>} />
+            <Route path='dashboard'>
+              <Route path="employee" element={<Employee />} />
+              <Route path="admin" element={<Admin />} />
+          </Route>
+          </Route>
+        </Route>
+        <Route path="login" element={<Authentication />} />
         </Routes>
-    </BrowserRouter>
     </div>
   );
 }

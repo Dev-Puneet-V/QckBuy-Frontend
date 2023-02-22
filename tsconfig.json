@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "typeRoots": ["node_modules/@types"],
+    "esModuleInterop": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -8,7 +10,6 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -19,7 +20,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "noImplicitAny": false
+    "noImplicitAny": false,
   },
   "include": [
     "src"

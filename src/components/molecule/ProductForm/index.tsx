@@ -14,12 +14,14 @@ import {
 import { request } from '../../../hooks';
 import { REQUEST_TYPE, STATUS } from '../../../type';
 import ProcessingButton from '../../atom/ProcessingButton';
+import { useCookies } from 'react-cookie';
 const categories = ['shortsleeves', 'longsleeves', 'sweatshirts', 'hoodies'];
 
 const AddProductForm = (props: any) => {
     const {
         productHandler
     } = props;
+    const [cookies] = useCookies(['token']);
   const [productName, setProductName] = useState<string>('');
   const [productDescription, setProductDescription] = useState<string>('');
   const [productQuantity, setProductQuantity] = useState<number>(0);
@@ -44,7 +46,7 @@ const AddProductForm = (props: any) => {
     const data = await request(
         REQUEST_TYPE.POST,
         process.env.REACT_APP_API_BASE_URL + '/product',
-        process.env.REACT_APP_ADMIN_TOKEN,
+        cookies.token,
         productData,
         fileData
     );

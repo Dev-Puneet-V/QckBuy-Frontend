@@ -102,28 +102,17 @@ const CheckoutForm = (props: any) => {
       }
     } else {
         if(result?.paymentIntent?.status === "succeeded"){
-            const postPaymentResponse = await fetch(`http://localhost:4000/api/v1/payment/stripe/paymentSuccess/${props.paymentIntentToken}`, {
-                // method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.REACT_APP_USER_TOKEN}`
-                },
-            });
-            const postPaymentData = await postPaymentResponse.json();
-            if(postPaymentData.success) {
+            
+            const postPaymentResponse = await request(REQUEST_TYPE.POST, `http://localhost:4000/api/v1/payment/stripe/paymentSuccess/${props.paymentIntentToken}`, "");
+            // const postPaymentData = await postPaymentResponse.json();
+            if(postPaymentResponse.success) {
                 setPaymentStatus(PAYMENT_STATUS.SUCCESS);
-                setPaymentId(postPaymentData.paymentId);
+                setPaymentId(postPaymentResponse.paymentId);
             }
         }else{
-            const postPaymentResponse = await fetch(`http://localhost:4000/api/v1/payment/stripe/paymentFailure/${props.paymentIntentToken}`, {
-                // method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.REACT_APP_USER_TOKEN}`
-                },
-            });
-            const postPaymentData = await postPaymentResponse.json();
-            if(postPaymentData.success) {
+            const postPaymentResponse = await request(REQUEST_TYPE.POST, `http://localhost:4000/api/v1/payment/stripe/paymentFailure/${props.paymentIntentToken}`, "");
+            // const postPaymentData = await postPaymentResponse.json();
+            if(postPaymentResponse.success) {
                 setPaymentStatus(PAYMENT_STATUS.FAILED);                
             }
         }
@@ -260,15 +249,9 @@ const Component = (props: any) => {
     const stripePromise = loadStripe('pk_test_51KZBqmSCKnbKzuc35ilsGw3OGk1dmrm17gEcdsE0MLzcWwas0uDWelAWqHZa7yqBvuDzznznl584Pibq9KEmOcMw00p62JM0f1');
     useEffect(() => { 
         const processor = async () => {
-            const paymentIntentResponse = await fetch("http://localhost:4000/api/v1/payment/stripe/initiatePayment", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.REACT_APP_USER_TOKEN}`
-                },
-            });
-            const paymentIntent = await paymentIntentResponse.json();
-            setPaymentIntent(paymentIntent);
+            const paymentIntentResponse = await request(REQUEST_TYPE.POST, "http://localhost:4000/api/v1/payment/stripe/initiatePayment", "");
+            // const paymentIntent = await paymentIntentResponse.json();
+            setPaymentIntent(paymentIntentResponse);
         }
         if(paymentStatus === PAYMENT_STATUS.FAILED || paymentStatus === PAYMENT_STATUS.PAY_NOW){
             processor();

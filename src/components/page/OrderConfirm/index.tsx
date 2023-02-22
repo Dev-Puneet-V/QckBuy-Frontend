@@ -8,6 +8,8 @@ import {
 } from "@mui/system";
 
 import { BrowserRouter, Routes, Route, useSearchParams } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import { request, REQUEST_TYPE } from "../../../hooks";
 interface ProductPropsType {
 
 }
@@ -22,6 +24,7 @@ enum PostPaymentStatus {
 }
 
 const Component = (props: any) => {
+    const [cookies] = useCookies(['token']);
     const confirmHandler = () => {
 
     }
@@ -32,10 +35,7 @@ const Component = (props: any) => {
     useEffect(() => {
         const processor = async () => {
             if(redirectStatus === 'succeeded'){
-                let response = await fetch(`http://localhost:4000/api/v1/payment/stripe/paymentSuccess/${paymentIntentId}`, {
-                headers: {Authorization: `Bearer ${process.env.REACT_APP_USER_TOKEN}`}
-                });
-                let data = await response.json();
+                let data = await request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/payment/stripe/paymentSuccess/${paymentIntentId}`, cookies.token);
                 if(data.success){
                     setPaymentStatus(PostPaymentStatus.DONE);
                 }else{

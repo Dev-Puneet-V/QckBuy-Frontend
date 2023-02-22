@@ -11,7 +11,9 @@ import { REQUEST_TYPE, request, isNumeric,} from '../../../hooks';
 import { TablePropsType } from '../../molecule/Table';
 import Modal from '../../molecule/Modal';
 import { STATUS } from '../../../type';
+import { useCookies } from 'react-cookie';
 const Component = (props: any) => {
+  const cookies = useCookies(['token']);
   const [historyData, setHistoryData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
   const [availableOrdersData, setAvailableOrdersData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
   const [acceptedOrdersData, setAcceptedOrdersData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
@@ -23,7 +25,7 @@ const Component = (props: any) => {
   const [orderId, setOrderId] = React.useState<string | undefined>();
   otpFieldRef.current = { value: '' };
   const getData = async (url: string, index: number) => {
-    const data = await request(REQUEST_TYPE.GET, url, process.env.REACT_APP_EMPLOYEE_TOKEN)
+    const data = await request(REQUEST_TYPE.GET, url, cookies.token)
     if(data.success && data?.data && data?.data?.length > 0){
         let columns: TablePropsType["columns"] = [];
         Object.keys(data?.data[0]).forEach((key: string) => {
@@ -94,7 +96,7 @@ const orderAcceptHandler = async (orderId: string, currRow: any) => {
     const data = await request(
         REQUEST_TYPE.POST,
         `http://localhost:4000/api/v1/order/accept/${orderId}`,
-        process.env.REACT_APP_EMPLOYEE_TOKEN
+        cookies.token
     )
     if(data.success){
         setAvailableOrdersData(prevAvailableOrdersData => {
@@ -115,7 +117,7 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
     const data = await request(
         REQUEST_TYPE.GET,
         `http://localhost:4000/api/v1/order/delivery/initiate/${orderId}`,
-        process.env.REACT_APP_EMPLOYEE_TOKEN
+        cookies.token
     );
     if(data.success){
         setOrderId(orderId);
@@ -213,7 +215,7 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
         const data = await request(
             REQUEST_TYPE.POST,
             `http://localhost:4000/api/v1/order/delivery/proceed/${orderId}`,
-            process.env.REACT_APP_EMPLOYEE_TOKEN,
+            cookies.token,
             {
                 "otp": otp
             }

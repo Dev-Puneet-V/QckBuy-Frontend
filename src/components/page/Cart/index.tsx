@@ -15,8 +15,9 @@ import TextIcon, {PositionType} from '../../molecule/TextIcon';
 import CartItem from '../../molecule/CartItem';
 import Modal from '../../molecule/Modal';
 import {useNavigate} from 'react-router-dom';
-import { updateCart, REQUEST_TYPE, deleteCart } from "../../../hooks";
+import { updateCart, REQUEST_TYPE, deleteCart, request } from "../../../hooks";
 import { STATUS } from "../../../type";
+import { useCookies } from "react-cookie";
 interface CartPropsType {
 
 }
@@ -34,16 +35,13 @@ const Component = (props: any) => {
     const {
         setCart
     } = props;
+    const [cookies] = useCookies(['token'])
     const [payment, setPayment] = useState(false);
     const [cartDeletionStatus, setCartDeletionStatus] = useState<STATUS>(STATUS.NOT_STARTED);
     const navigate = useNavigate();
     useEffect(() =>{
         const processor = async () => {
-            let response = await fetch(`http://localhost:4000/api/v1/user/cart`, {
-              headers: {Authorization: `Bearer ${process.env.REACT_APP_USER_TOKEN}`}
-            });
-            let data = await response.json();
-            console.log(data)
+            let data = await request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/user/cart`, cookies.token);
             setCart(data.cartItems);
         }
         processor();

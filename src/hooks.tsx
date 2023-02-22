@@ -1,5 +1,5 @@
 import BigPromise from "./bigPromise";
-const util = require('util')
+import { useCookies } from 'react-cookie';
 enum REQUEST_TYPE {
     POST,
     PATCH,
@@ -14,7 +14,6 @@ interface JSONDataType {
 
 const request = BigPromise(async (request_type: REQUEST_TYPE, request_url: URL, bearer_token?: String, bodyData?: Object, fileData?: any ) => {
     const formData = new FormData();
-    
     if(fileData){
       fileData.forEach((file: File, index: number) => {
         formData.append(`photos`, file, file.name);
@@ -84,6 +83,16 @@ function filterData(text: string, data: JSONDataType) {
 
 function jsonToArray(jsonData: JSONDataType) {
   return Object.keys(jsonData).map((key) => jsonData[key]);
+}
+
+function nameValidator(value: string) {
+  if (!value) {
+    return 'Name is required';
+  }
+  if (value.length < 3) {
+    return 'Name must be at least 3 characters long';
+  }
+  return undefined;
 }
 
 export {

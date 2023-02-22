@@ -10,37 +10,38 @@ import {
     Typography 
 } from "@mui/material";
 import { 
-    AddShoppingCartOutlined, 
+    ShoppingCartOutlined, 
     VisibilityOutlined 
 } from "@mui/icons-material";
-import TextIcon, {PositionType} from '../../molecule/TextIcon';
+import TextIcon, { PositionType } from '../../molecule/TextIcon';
 import { useNavigate } from "react-router-dom";
 
 interface CardPropsType {
-    width: String;
-    height: String;
-    backgroundColor: String;
-    image: String;
-    name: String;
-    description: String;
-    cost: String | Number;
+    width: string;
+    height: string;
+    backgroundColor: string;
+    image: string;
+    name: string;
+    description: string;
+    cost: string | number;
     setCurrentRoutePath: any;
 }
 
-const Component = (props: any) => {
-  let navigate = useNavigate(); 
+const ProductCard = (props: any) => {
+  const navigate = useNavigate(); 
   return (
     <Card sx={{ 
         width: 300, 
-        backgroundColor: '#fcf7ff',  
-        boxShadow: '1px 1px 3px -1px rgba(82,70,82,1)'
+        height: 400,
+        backgroundColor: '#f9f7fb',  
+        boxShadow: '0px 4px 8px rgba(38, 35, 36, 0.1)'
     }}>
       <CardMedia
         component="img"
-        alt="green iguana"
+        alt={props.product.name}
         height="200"
         image={props.product?.photos[0]?.secure_url}
-        onClick={() => {navigate(`product/${props.product?._id}`)}}
+        onClick={() => navigate(`product/${props.product?._id}`)}
       />
       <CardContent>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -50,9 +51,9 @@ const Component = (props: any) => {
           <Rating name="read-only" value={props.product.ratings} readOnly />
         </Box>
         <Box height="50px">
-        <Typography variant="body2" color="text.secondary">
-          {props.product.description}
-        </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {props.product.description}
+          </Typography>
         </Box>
         
       </CardContent>
@@ -62,16 +63,20 @@ const Component = (props: any) => {
         color: 'black'
       }}>
         <Button size="small">
-            <Typography sx={{color: 'grey'}}>
-                Rs {props.product.price}
-            </Typography>
+          <Typography sx={{color: 'grey'}}>
+            Rs {props.product.price}
+          </Typography>
         </Button>
         <Button size="small">
-            <TextIcon text="Add to cart" icon={<AddShoppingCartOutlined sx={{color: 'grey'}} />} iconPosition={PositionType.Right} />
+          <TextIcon 
+            text="Add to cart" 
+            icon={<ShoppingCartOutlined sx={{color: 'grey'}} />} 
+            iconPosition={PositionType.Right} 
+          />
         </Button>
       </CardActions>
     </Card>
   );
 }
 
-export default Component;
+export default ProductCard;

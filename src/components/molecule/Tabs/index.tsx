@@ -2,15 +2,13 @@ import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-// import tabTheme from '../../../theme/tabTheme';
-import { ThemeProvider } from '@mui/material/styles';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((themes) => ({
   [themes.breakpoints.down('sm')]: {
       tab: {
-          fontSize: '13px',
-          width: 'calc(100% / 3)'
+          fontSize: '15px',
+          textTransform: 'none !important'
       }
   },
 })); 
@@ -23,6 +21,7 @@ interface TabType{
 interface Type{
   tabData: TabType[];
   stateHandler : Function;
+  sx?: any;
 }
 
 const TabsWrappedLabel = ({tabData, ...props}: Type) => {
@@ -33,7 +32,7 @@ const TabsWrappedLabel = ({tabData, ...props}: Type) => {
     props.stateHandler(newValue);
   };
   return (
-    <Box sx={{ padding: '0px', borderColor: 'divider', width: '100%' }}>
+    <Box sx={{ padding: '0px', borderColor: 'divider', width: '100%', ...props.sx }} key={value}>
     {/* <ThemeProvider theme={tabTheme}> */}
       <Tabs
       style={{display: 'flex', justifyContent: 'space-around', width: '100%', marginBottom: '5px'}}
@@ -51,7 +50,7 @@ const TabsWrappedLabel = ({tabData, ...props}: Type) => {
                 value={currTab.value} 
                 label={currTab.label}  
                 data-testid={`tab-${currTab.value}`} 
-                sx={{maxWidth:'calc(100% / 3)', width: `calc(100% / 3)` , fontSize: '16px', borderBottom: '2px solid #E1ECFC', alignItems: 'start'}}  
+                sx={{maxWidth:`calc(100% / ${tabData.length})`, width: `calc(100% / ${tabData.length})` , fontSize: '16px', borderBottom: '2px solid #E1ECFC', alignItems: 'start', textTransform: 'none !important'}}  
                 className={classes.tab}/>
             );
           })

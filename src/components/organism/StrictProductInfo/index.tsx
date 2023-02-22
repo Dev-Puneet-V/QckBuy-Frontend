@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardMedia, TextField, Typography } from 
 import { Edit } from '@mui/icons-material';
 import { request } from '../../../hooks';
 import { REQUEST_TYPE } from '../../../type';
+import { useCookies } from 'react-cookie';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ProductInfo = ({ product }) => {
+  const [cookies] = useCookies(['token']);
   const classes = useStyles();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(product?.name);
@@ -60,7 +62,7 @@ const ProductInfo = ({ product }) => {
     const data = await request(
         REQUEST_TYPE.PUT,
         `${process.env.REACT_APP_API_BASE_URL}/product/${product?._id}`,
-        process.env.REACT_APP_ADMIN_TOKEN,
+        cookies.token,
         reqBody
     );
     if(data.success){

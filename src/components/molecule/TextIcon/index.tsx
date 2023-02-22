@@ -10,6 +10,7 @@ interface PropsType {
     iconPosition: PositionType;
     text?: String | null | number;
     sx?: any;
+    onClick?: (event: any) => void;
 }
 
 const StyledComponent = styled('div')({
@@ -32,7 +33,7 @@ const Component = (props: PropsType) => {
     } = props;
 
     return (
-        <StyledComponent>
+        <StyledComponent onClick={remainingProp.onClick}>
             {
                 iconPosition === PositionType.Left && icon
             }

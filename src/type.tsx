@@ -54,11 +54,23 @@ const EMPLOYEE_TAB_DATA = [
     }
 ]
 
+const USER_AUTHENTICATION_TAB_DATA = [
+    {
+        'value': 'login',
+        'label': 'Sign in to Continue'
+    },
+    {
+        'value': 'signup',
+        'label': 'Create an Account'
+    }
+]
+
 export {
     STATUS,
     REQUEST_TYPE,
     TABLE_COLUMN_TYPE,
-    EMPLOYEE_TAB_DATA
+    EMPLOYEE_TAB_DATA,
+    USER_AUTHENTICATION_TAB_DATA
 };
 export type {
     ReviewType,

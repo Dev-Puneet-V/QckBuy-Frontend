@@ -24,7 +24,9 @@ import SecureEmployee from '../../organism/SecureEmployee';
 import {
     EmployeeState
 } from '../../../contexts/Employee';
+import { useCookies } from "react-cookie";
 const Component = (props: any) => {
+    const cookies = useCookies(['token']);
     const inputRef = React.useRef<{ productSearchHandler: (event: React.SyntheticEvent) => void }>();
     const [products, setProducts] = React.useState<any>([]);
     const [state, setState] = React.useState<STATUS>(STATUS.NOT_STARTED);
@@ -36,7 +38,7 @@ const Component = (props: any) => {
         request(
             REQUEST_TYPE.GET,
             `${process.env.REACT_APP_API_BASE_URL}/product/admin`,
-            process.env.REACT_APP_ADMIN_TOKEN
+            cookies.token
         ).then(data => {
             if(data && data.success){
                 setProducts(data.products);

@@ -12,6 +12,8 @@ import {
 import ProductMiniImages from '../../organism/ProductMiniImage';
 import ProductInfo from '../../organism/ProductInfo';
 import { useParams } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import { request, REQUEST_TYPE } from '../../../hooks';
 interface ProductPropsType {
 
 }
@@ -28,16 +30,16 @@ const StyledComponent = styled('div')({
 
 
 const Component = (props: any) => {
+    const [cookies] = useCookies(['token'])
     const [productInfo, setProductInfo] = useState<any>();
     const { id } = useParams();
     useEffect(() =>{
         const processor = async () => {
-            let response = await fetch(`http://localhost:4000/api/v1/product/${id}`, {
-              headers: {
-                'Authorization': `Bearer ${process.env.REACT_APP_USER_TOKEN}`
-            }
-            });
-            let data = await response.json();
+            let data = await request(
+                REQUEST_TYPE.GET, 
+                `http://localhost:4000/api/v1/product/${id}`, 
+                cookies.token
+            );
             const productInfo = data.product;
             setProductInfo(productInfo);
         }
