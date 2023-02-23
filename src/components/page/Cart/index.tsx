@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useContext} from "react";
 import { 
     Box,
     Typography,
@@ -18,6 +18,7 @@ import {useNavigate} from 'react-router-dom';
 import { updateCart, REQUEST_TYPE, deleteCart, request } from "../../../hooks";
 import { STATUS } from "../../../type";
 import { useCookies } from "react-cookie";
+import { CartContext } from "../../../contexts/Cart";
 interface CartPropsType {
 
 }
@@ -32,27 +33,10 @@ const StyledComponent = styled('div')({
 
 
 const Component = (props: any) => {
-    const {
-        setCart
-    } = props;
-    const [cookies] = useCookies(['token'])
-    const [payment, setPayment] = useState(false);
+    const cartContext = useContext(CartContext);
     const [cartDeletionStatus, setCartDeletionStatus] = useState<STATUS>(STATUS.NOT_STARTED);
     const navigate = useNavigate();
-    useEffect(() =>{
-        const processor = async () => {
-            let data = await request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/user/cart`, cookies.token);
-            setCart(data.cartItems);
-        }
-        processor();
-      }, []);
-    let totalCost = () => {
-        const cost = props.cart.reduce(
-            (accumulator: number, currentValue: any) => accumulator + currentValue?.quantity * currentValue?.product.price,
-            0
-        );
-        return cost;
-    }
+    
     return (
         <StyledComponent>
             <Box
@@ -63,7 +47,7 @@ const Component = (props: any) => {
                     alignItems: 'center',
                     justifyContent: 'end',
                     overyflowY: 'scroll',
-                    width: '50%'
+                    width: '100%'
                 }}
             >
             { 
@@ -85,7 +69,7 @@ const Component = (props: any) => {
                 }}
             >
             <Typography variant="subtitle1">
-                <pre><b>Total cost (in Rs) : </b> {totalCost()}</pre>
+                <pre><b>Total cost (in Rs) : </b> {cartContext?.totalCost}</pre>
             </Typography>
             <Box sx={{
                 width: '510px',
@@ -108,8 +92,7 @@ const Component = (props: any) => {
                     color="error"
                     onClick={async () => {
                         setCartDeletionStatus(STATUS.PROCESSING);
-                        const deleteStatus = await deleteCart("a", "b", "c");
-                        console.log(deleteStatus)
+                        const deleteStatus = cartContext?.deleteCart;
                         if(deleteStatus) {
                             setCartDeletionStatus(STATUS.SUCCESS);
                             navigate('/')

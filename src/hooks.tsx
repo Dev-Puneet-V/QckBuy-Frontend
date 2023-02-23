@@ -48,7 +48,7 @@ const updateCart = BigPromise(async (increment: boolean, productId: String, next
     next();
     return data.success;
 });
-const deleteCart = BigPromise(async (a: any, b: any, c: any) => {
+const deleteCart = BigPromise(async (a?: any, b?: any, c?: any) => {
     let data = await request(
         REQUEST_TYPE.DELETE, 
         `http://localhost:4000/api/v1/user/cart/`,

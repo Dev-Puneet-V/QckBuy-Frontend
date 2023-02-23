@@ -1,11 +1,12 @@
-    import {useState} from "react";
+    import {useContext, useState} from "react";
     import {  
         Typography,
         Rating,
         Box,
         DialogContent, 
         DialogTitle,
-        Button
+        Button,
+        Stack
     } from "@mui/material";
     import { 
         KeyboardArrowDownOutlined,
@@ -21,6 +22,7 @@
 import { updateCart } from "../../../hooks";
 import { STATUS } from "../../../type";
 import {useNavigate} from 'react-router-dom';
+import { CartContext } from "../../../contexts/Cart";
     interface ProductInfoPropsType {
         id: String;
         name: String;
@@ -35,12 +37,13 @@ import {useNavigate} from 'react-router-dom';
     }
 
     const StyledComponent = styled('div')({
-        width: '550px',
-        minHeight: '350px',
+        // width: '550px',
+        // minHeight: '350px',
         display: 'flex',
         flexDirection: 'column',
         flexWrap: 'nowrap',
         justifyItems: 'top',
+        alignItems: 'flex-start',
         margin: '5px',
         padding: '3px',
         position: 'relative'
@@ -49,6 +52,7 @@ import {useNavigate} from 'react-router-dom';
 
     const Component = (props: ProductInfoPropsType) => {
         let navigate = useNavigate();
+        const cartContext = useContext(CartContext);
         let {
             id,
             name,
@@ -68,15 +72,13 @@ import {useNavigate} from 'react-router-dom';
                 <Typography variant="h4">
                     {name}
                 </Typography>
-                <Typography variant="subtitle2">
-                    {description}
-                </Typography>
-                <Typography variant="subtitle2">
-                    <pre><b>Brand : </b>{brand}</pre>
-                    <pre><b>Category : </b>{category}</pre>
+                <Typography variant="subtitle2" >
+                    <Stack direction="row"><b style={{width:'70px'}}>About : </b><Box sx={{maxWidth: '500px', width: '100%', height: 'auto', wordWrap: 'break-word', whiteSpace: 'pre-wrap'}}>{description}</Box></Stack>
+                    <pre><b style={{width:'70px'}}>Brand : </b>{brand}</pre>
+                    <pre><b style={{width:'70px'}}>Category : </b>{category}</pre>
                     <pre><b style={{
                         fontSize: '16px',
-                        marginRight: '2px'
+                        width:'70px'
                     }}>Rs : </b>{price}</pre> 
                 </Typography>
                 <Box sx={{
@@ -132,8 +134,7 @@ import {useNavigate} from 'react-router-dom';
                                 disabled={quantity === 0 || cartUpdateStatus !== STATUS.NOT_STARTED} 
                                 onClick={async () => {
                                     setCartUpdateStatus(STATUS.PROCESSING);
-                                    const cartStatus = await updateCart(true, id, () => {});
-                                    console.log(cartStatus, "Hello")
+                                    const cartStatus = await cartContext?.updateProductInCart(id, true);
                                     if(cartStatus) {
                                         setCartUpdateStatus(STATUS.SUCCESS);
                                         navigate('/cart');

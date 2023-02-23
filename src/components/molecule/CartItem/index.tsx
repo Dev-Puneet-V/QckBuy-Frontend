@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {  
     Box,
     Button,
@@ -15,6 +15,7 @@ import Image from '../../atom/Image';
 import { request, REQUEST_TYPE, updateCart } from "../../../hooks";
 import { STATUS } from "../../../type";
 import { useCookies } from "react-cookie";
+import { CartContext } from "../../../contexts/Cart";
 interface CartItemPropsType {
 
 }
@@ -27,29 +28,19 @@ const StyledComponent = styled('div')({
 });
 
 const Component = (props: any) => {
-    const [cookies] = useCookies(['token']);
+    const cartContext = useContext(CartContext);
     const [productCountInCart, setProductCountInCart] = useState(props.cartItem?.quantity);
     const [updateStatus, setCartUpdateStatus] = useState<STATUS>(STATUS.NOT_STARTED);
     const reduceFromCartHandler = async () => {
         setCartUpdateStatus(STATUS.PROCESSING);
-        let data = await request(
-            REQUEST_TYPE.PATCH, 
-            `http://localhost:4000/api/v1/user/cart/${props.cartItem?.product?._id}`, 
-            cookies.token
-        )
-        const status = data.success;
+        const status = await  cartContext?.updateProductInCart(props.cartItem?._id, true);
         status && setProductCountInCart(productCountInCart - 1);
         setCartUpdateStatus(STATUS.NOT_STARTED);
     }
     
     const addToCartHandler = async () => {
         setCartUpdateStatus(STATUS.PROCESSING);
-        let data = await request(
-            REQUEST_TYPE.POST, 
-            `http://localhost:4000/api/v1/user/cart/${props.cartItem?.product?._id}`, 
-            cookies.token
-        )
-        const status = data.success;
+        const status = await cartContext?.updateProductInCart(props.cartItem?._id, false);
         status && setProductCountInCart(productCountInCart + 1);
         setCartUpdateStatus(STATUS.NOT_STARTED);
     }

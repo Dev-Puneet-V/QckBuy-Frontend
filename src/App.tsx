@@ -12,13 +12,13 @@ import Authentication from './components/organism/Authentication';
 import PrivateRoute from './components/molecule/PrivateRoute';
 import DefaultLayout from './components/template/DefaultLayout';
 import { useCookies } from 'react-cookie';
+import { CartState } from './contexts/Cart';
 interface AuthType {
   isAuthenticated: boolean;
   user?: any
 }
 function App() {
   const navigate = useNavigate();
-  const [cart, setCart] = useState([]);
   const [cookies] = useCookies(['token']);
   const [isLoading, setIsLoading] = React.useState(true);
   const [auth, setAuth] = React.useState<AuthType>({isAuthenticated: cookies.token ? true : false}); 
@@ -37,24 +37,27 @@ function App() {
   return (
     <div className="App">
       {/* <Header /> */}
-        <Routes>
-        <Route element={<PrivateRoute isAuthenticated={auth.isAuthenticated}/>}>
-          <Route element={<DefaultLayout />}>
-            <Route index element={<Home />} />
-            <Route path="product">
-              <Route path=":id" element={<Product />} />
+        <CartState>
+            <Routes>
+            <Route element={<PrivateRoute isAuthenticated={auth.isAuthenticated}/>}>
+            <Route element={<DefaultLayout />}>
+                
+                    <Route index element={<Home />} />
+                    <Route path="product">
+                        <Route path=":id" element={<Product />} />
+                    </Route>
+                    <Route path="payment" element={<Payment />} />
+                    <Route path="cart" element={<Cart />} />
+                    <Route path="confirm" element={<OrderConfirm/>} />
+                <Route path='dashboard'>
+                <Route path="employee" element={<Employee />} />
+                <Route path="admin" element={<Admin />} />
             </Route>
-            <Route path="payment" element={<Payment cart={cart}/>} />
-            <Route path="cart" element={<Cart cart={cart} setCart={setCart} />} />
-            <Route path="confirm" element={<OrderConfirm/>} />
-            <Route path='dashboard'>
-              <Route path="employee" element={<Employee />} />
-              <Route path="admin" element={<Admin />} />
-          </Route>
-          </Route>
-        </Route>
-        <Route path="login" element={<Authentication />} />
-        </Routes>
+            </Route>
+            </Route>
+            <Route path="login" element={<Authentication />} />
+            </Routes>
+        </CartState>
     </div>
   );
 }

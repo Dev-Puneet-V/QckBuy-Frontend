@@ -1,6 +1,6 @@
-import {useState, useEffect, useRef} from "react";
+import {useState, useEffect, useRef, useContext} from "react";
 import {  
-    Button, Typography
+    Button, Stack, Typography, useMediaQuery, useTheme
 } from "@mui/material";
 import { 
     EnhancedEncryptionOutlined,
@@ -17,18 +17,23 @@ import {
     Box, 
     styled 
 } from "@mui/system";
-import {Elements, PaymentElement, useStripe, useElements} from '@stripe/react-stripe-js';
+import {Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import {loadStripe} from '@stripe/stripe-js';
 import TextIcon, {PositionType} from '../../molecule/TextIcon';
 import Receipt from '../../molecule/Receipt';
 import { request } from "../../../hooks";
 import { REQUEST_TYPE } from "../../../type";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
+import { CartContext } from "../../../contexts/Cart";
 interface PaymentPropsType {
 
 }
 
 const StyledComponent = styled('div')({
 });
+
+
 
 enum PAYMENT_STATUS {
     SUCCESS,
@@ -39,28 +44,30 @@ enum PAYMENT_STATUS {
     NOT_READY
 }
 
+
 const CheckoutForm = (props: any) => {
+    const theme = useTheme();
+  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
+    const cartContext = useContext(CartContext);
+    //useRef will create a reference to cartContext?.context and will not change even if cart is rerendered due to value change
+    const products = useRef(cartContext?.cart);
+    const cookies = props.cookies;
     const printRef = useRef();
     const {
         paymentStatus, 
         setPaymentStatus,
         cost,
-        products,
     } = props
     const stripe = useStripe();
     const elements = useElements();
-    // if(stripe && elements){
-        // setPaymentStatus(PAYMENT_STATUS.PAY_NOW)
-    // }
     const [invoiceUrl, setInvoiceUrl] = useState("");
     const [paymentId, setPaymentId] = useState("");
+   
     const invoiceDownloadHandler = async () => {
-        console.log("Entered")
         if(invoiceUrl.length > 0){
             fileDownload(invoiceUrl, "Invoice.pdf");
             return;
         }
-        console.log("First notd found")
         const invoice = await request(
             REQUEST_TYPE.GET, 
             `http://localhost:4000/api/v1/order/${paymentId}/invoice/true`, 
@@ -76,8 +83,6 @@ const CheckoutForm = (props: any) => {
     };
   const handleSubmit = async (event: any) => {
     setPaymentStatus(PAYMENT_STATUS.PROCESSING);
-    // We don't want to let default form submission happen here,
-    // which would refresh the page.
     event.preventDefault();
     
     if (!stripe || !elements) {
@@ -103,14 +108,15 @@ const CheckoutForm = (props: any) => {
     } else {
         if(result?.paymentIntent?.status === "succeeded"){
             
-            const postPaymentResponse = await request(REQUEST_TYPE.POST, `http://localhost:4000/api/v1/payment/stripe/paymentSuccess/${props.paymentIntentToken}`, "");
+            const postPaymentResponse = await request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/payment/stripe/paymentSuccess/${props.paymentIntentToken}`, cookies.token);
             // const postPaymentData = await postPaymentResponse.json();
             if(postPaymentResponse.success) {
+                cartContext?.deleteCart();
                 setPaymentStatus(PAYMENT_STATUS.SUCCESS);
                 setPaymentId(postPaymentResponse.paymentId);
             }
         }else{
-            const postPaymentResponse = await request(REQUEST_TYPE.POST, `http://localhost:4000/api/v1/payment/stripe/paymentFailure/${props.paymentIntentToken}`, "");
+            const postPaymentResponse = await request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/payment/stripe/paymentFailure/${props.paymentIntentToken}`, cookies.token);
             // const postPaymentData = await postPaymentResponse.json();
             if(postPaymentResponse.success) {
                 setPaymentStatus(PAYMENT_STATUS.FAILED);                
@@ -120,13 +126,24 @@ const CheckoutForm = (props: any) => {
   };
     return (
       <form onSubmit={handleSubmit}>
+        <Stack
+            direction="column"
+            spacing={1}
+            justifyItems='center'
+            alignContent='center'
+            height={isMobileView ? 'calc(100vh - 70vw)': '600px'}
+            width={isMobileView ? '100%': '400px'}
+            sx={{
+                p: 1
+            }}
+        >
         {
             !(paymentStatus === PAYMENT_STATUS.SUCCESS) &&
-            <PaymentElement />
+            <PaymentElement/>
         }
         {
             (paymentStatus === PAYMENT_STATUS.SUCCESS) && 
-            <Receipt products={products} ref={printRef}/>
+            <Receipt products={products.current} ref={printRef}/>
         }
         <Box sx={{
             display: 'flex',
@@ -184,7 +201,7 @@ const CheckoutForm = (props: any) => {
                     (paymentStatus === PAYMENT_STATUS.PAY_NOW && (
                         <Box sx={{display: 'flex'}}>
                             <CurrencyRupee sx={{fontWeight: 'bold'}}/> 
-                            <Typography>{cost / 100}</Typography> 
+                            <Typography>{(cartContext?.totalCost || 0)}</Typography> 
                             <Typography sx={{marginLeft: '15px'}}><b>Payment</b></Typography>
                         </Box>
                     )) ||
@@ -236,6 +253,8 @@ const CheckoutForm = (props: any) => {
             }
         </Box>
         
+            
+        </Stack>
         {/* <Button variant="contained" color="success"  sx={{textAlign: 'left', marginTop: '10px'}} disabled={!stripe}>
             Pay now
         </Button> */}
@@ -243,22 +262,34 @@ const CheckoutForm = (props: any) => {
     );
   };
 
-const Component = (props: any) => {
+const Component = () => {
+    const navigate = useNavigate();
+    const [cookies] = useCookies(['token']);
     const [paymentIntent, setPaymentIntent] = useState<any>(undefined)
     const [paymentStatus, setPaymentStatus] = useState(PAYMENT_STATUS.PAY_NOW);
+    const [retry, setRetry] = useState(0);
     const stripePromise = loadStripe('pk_test_51KZBqmSCKnbKzuc35ilsGw3OGk1dmrm17gEcdsE0MLzcWwas0uDWelAWqHZa7yqBvuDzznznl584Pibq9KEmOcMw00p62JM0f1');
     useEffect(() => { 
         const processor = async () => {
-            const paymentIntentResponse = await request(REQUEST_TYPE.POST, "http://localhost:4000/api/v1/payment/stripe/initiatePayment", "");
-            // const paymentIntent = await paymentIntentResponse.json();
-            setPaymentIntent(paymentIntentResponse);
+            setRetry(retry + 1);
+            const paymentIntentResponse = await request(REQUEST_TYPE.POST, "http://localhost:4000/api/v1/payment/stripe/initiatePayment", cookies.token);
+            if(paymentIntentResponse.success){
+                setPaymentIntent(paymentIntentResponse);
+            }else{
+                if(retry >= 3){
+                    navigate('/cart');
+                }else{
+                    setPaymentStatus(PAYMENT_STATUS.FAILED);
+                }
+            }
         }
         if(paymentStatus === PAYMENT_STATUS.FAILED || paymentStatus === PAYMENT_STATUS.PAY_NOW){
             processor();
         }
     }, [paymentStatus]);
     const options = {
-        clientSecret: paymentIntent?.clientSecret
+        clientSecret: paymentIntent?.clientSecret,
+        paymentMethodTypes: ['card', 'sepa_debit', 'ideal', 'fpx'],
     };
     return (
         <StyledComponent>
@@ -271,7 +302,7 @@ const Component = (props: any) => {
                 }}>
                 {
                     <Elements stripe={stripePromise} options={options}>
-                        <CheckoutForm paymentIntentToken={paymentIntent.paymentIntentIdToken} paymentStatus={paymentStatus} setPaymentStatus={setPaymentStatus} cost={paymentIntent?.cost} products={props.cart}/>
+                        <CheckoutForm paymentIntentToken={paymentIntent.paymentIntentIdToken} paymentStatus={paymentStatus} setPaymentStatus={setPaymentStatus} cost={paymentIntent?.cost} cookies={cookies}/>
                     </Elements>
                 }
                 </Box>
