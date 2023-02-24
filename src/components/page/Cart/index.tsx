@@ -17,7 +17,6 @@ import TextIcon, {PositionType} from '../../molecule/TextIcon';
 import CartItem from '../../molecule/CartItem';
 import Modal from '../../molecule/Modal';
 import {useNavigate} from 'react-router-dom';
-import { updateCart, REQUEST_TYPE, deleteCart, request } from "../../../hooks";
 import { STATUS } from "../../../type";
 import { useCookies } from "react-cookie";
 import { CartContext } from "../../../contexts/Cart";
@@ -40,18 +39,16 @@ const Component = (props: any) => {
     const cartContext = useContext(CartContext);
     const [cartDeletionStatus, setCartDeletionStatus] = useState<STATUS>(STATUS.NOT_STARTED);
     const navigate = useNavigate();
-    console.log("checking", props.cart)
     return (
         <StyledComponent>
             <Box
                 sx={{
-                    height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    justifyContent: 'end',
-                    overyflowY: 'scroll',
-                    width: '90vw'
+                    width: '95vw',
+                    height: '70vh',
+                    overflowY: 'scroll'
                 }}
             >
             { 

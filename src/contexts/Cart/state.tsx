@@ -11,7 +11,7 @@ const CartState = (props: any) => {
     const [cookies] = useCookies(['token']);
     const [cart, setCart] = React.useState<any[]>([]);
     const [totalCost, setTotalCost] = React.useState<number>(0);
-    
+    const [totalQuantity, setTotalQuantity] = React.useState<number>(0);
     
     const updateCartData: Function = () => {
         request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/user/cart`, cookies.token).then(data => {
@@ -29,7 +29,12 @@ const CartState = (props: any) => {
         }
     }, [cookies.token]);
     React.useEffect(() => {
-        setTotalCost(totalCartCost());
+        const {
+            updatedCost,
+            updatedQuantity
+        } = totalCartValues();
+        setTotalCost(updatedCost);
+        setTotalQuantity(updatedQuantity)
     }, [cart]);
     const updateProductInCart: Function = bigPromise(async (productId: string, toIncrement: boolean) => {
         try{
@@ -39,32 +44,27 @@ const CartState = (props: any) => {
                 cookies.token
             );
             if(data.success){
-                let exists = false;
-                setCart((prevCartItems: any) => {
-                    return prevCartItems?.map((item: any) => {
-                        if(item.quantity === 0 && !toIncrement){
-                            throw new Error('Product out of range')
+                let itemExists = false;
+                for (let i = 0; i < cart.length; i++) {
+                    const item = cart[i];
+                    if (item.product?._id === productId) {
+                        if (toIncrement) {
+                            item.quantity++;
+                        } else {
+                            if (item.quantity === 0) {
+                                throw new Error('Product out of range');
+                            }
+                            item.quantity--;
                         }
-                    if (item._id === productId) {
-                        exists = true;
-                        setTotalCost(toIncrement ? (totalCost + item.price) : (totalCost - item.price));
-                        return {
-                            ...item,
-                            quantity: !toIncrement ? item.quantity - 1 : item.quantity + 1
-                        };
+                        itemExists = true;
+                        break;
                     }
-                    return item;
-                    });
-                    
-                });
-                
-                if(!exists){
-                    let newData = [{
-                        "product": data.cartItems[0].product,
-                        "quantity": 1
-                    }]
-                    setCart(newData)
                 }
+                if (!itemExists) {
+                    setCart([...data.cartItems]);
+                } else {
+                setCart([...cart]);
+            }
                 return true;
             }else{
                 throw new Error(`Problem  ${toIncrement ? 'incrementing' : 'decrementing'} product from cart`);
@@ -75,19 +75,23 @@ const CartState = (props: any) => {
         }
     });
 
-    const totalCartCost = () => {
+    const totalCartValues = () => {
         if(!cart || cart.length === 0){
-            return 0;
+            return {
+                updatedCost: 0, 
+                updatedQuantity: 0
+            };
         }
-        cart.map(currentValue => {
-            console.log(currentValue?.quantity, currentValue?.product.price)
-        })
-        const cost = cart?.reduce(
-            (accumulator: number, currentValue: any) => accumulator + currentValue?.quantity * currentValue?.product.price,
-            0
+        const updatedValues = cart?.reduce(
+            (accumulator: {updatedCost: number, updatedQuantity: number}, currentValue: any) => {
+                return {
+                    updatedCost: accumulator.updatedCost + currentValue?.quantity * currentValue?.product.price,
+                    updatedQuantity: accumulator.updatedQuantity + currentValue?.quantity
+                }
+            },
+            {updatedQuantity: 0, updatedCost: 0}
         );
-        console.log(cost, "cost")
-        return cost;
+        return updatedValues;
     }
     
 
@@ -101,6 +105,7 @@ const CartState = (props: any) => {
             if(data.success){
                 setCart([]);
             }else{
+                console.error("Error in deletion")
                 throw new Error('Error in deletion of cart');
             }
         }catch(error: any){
@@ -109,7 +114,7 @@ const CartState = (props: any) => {
         }
     };
     return (
-        <CartContext.Provider value={{cart, updateCartData, setCart, updateProductInCart, deleteCart, totalCost}}>
+        <CartContext.Provider value={{cart, updateCartData, setCart, updateProductInCart, deleteCart, totalCost, totalQuantity}}>
             {props.children}
         </CartContext.Provider>
     )

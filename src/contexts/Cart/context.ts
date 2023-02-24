@@ -7,6 +7,7 @@ type CartContextType = {
     deleteCart: Function;
     setCart: React.Dispatch<any>;    
     totalCost: number;
+    totalQuantity: number;
 }
 
 

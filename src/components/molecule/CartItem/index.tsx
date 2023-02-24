@@ -76,7 +76,7 @@ const Component = (props: any) => {
                 
                 <Box sx={{
                     display: 'flex',
-                    width: '160px',
+                    width: '210px',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '5px'
@@ -121,6 +121,7 @@ const Component = (props: any) => {
                             margin: '0px',
                             padding: '0px',
                             width: '10px',
+                            mr: '3px'
                             // color: 'grey'
                         }}
                         

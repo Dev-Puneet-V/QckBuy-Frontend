@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   AppBar,
   Badge,
@@ -12,9 +12,7 @@ import { AccountCircle, ExitToApp, ShoppingCart } from "@mui/icons-material";
 import { makeStyles } from '@material-ui/core/styles';
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-import {
-  QckbuyIcon
-} from '../../atom';
+import { CartContext } from "../../../contexts/Cart";
 const useStyles = makeStyles((headerTheme) => ({
     appBar: {
       zIndex: headerTheme.zIndex.drawer + 1,
@@ -68,17 +66,23 @@ const Header = () => {
   const classes = useStyles();
   const [cookies,, removeCookie] = useCookies(["token"]);
   const navigate = useNavigate();
-
+  const cartContext = useContext(CartContext);
   const handleLogout = () => {
     removeCookie("token");
     navigate("/login");
   };
 
+  const cartRouteHandler = () => {
+    navigate('/cart');
+  }
+  const homeRouteHandler = () => {
+    navigate('/')
+  }
   return (
     
     <AppBar position="fixed" className={classes.appBar}>
     <Toolbar>
-        <Box className={classes.logo}>
+        <Box className={classes.logo} onClick={homeRouteHandler}>
         <IconButton edge="start" color="inherit">
           <ShoppingCart />
         </IconButton>
@@ -90,7 +94,7 @@ const Header = () => {
         {cookies.token ? (
         <Box>
             <IconButton className={classes.iconButton}>
-            <Badge badgeContent={1} color="error">
+            <Badge badgeContent={cartContext?.totalQuantity} color="error" onClick={cartRouteHandler}>
                 <ShoppingCart />
             </Badge>
             </IconButton>
