@@ -1,6 +1,6 @@
 import {useState, useEffect, useRef, useContext} from "react";
 import {  
-    Button, Stack, Typography, useMediaQuery, useTheme
+    Button, CircularProgress, Stack, Typography, useMediaQuery, useTheme
 } from "@mui/material";
 import { 
     EnhancedEncryptionOutlined,
@@ -31,6 +31,11 @@ interface PaymentPropsType {
 }
 
 const StyledComponent = styled('div')({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '80vh',
+    width: '100vw'
 });
 
 
@@ -62,7 +67,6 @@ const CheckoutForm = (props: any) => {
     const elements = useElements();
     const [invoiceUrl, setInvoiceUrl] = useState("");
     const [paymentId, setPaymentId] = useState("");
-   
     const invoiceDownloadHandler = async () => {
         if(invoiceUrl.length > 0){
             fileDownload(invoiceUrl, "Invoice.pdf");
@@ -134,36 +138,39 @@ const CheckoutForm = (props: any) => {
             height={isMobileView ? 'calc(100vh - 70vw)': '600px'}
             width={isMobileView ? '100%': '400px'}
             sx={{
-                p: 1
+                padding: '13px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent:' center',
+                width: isMobileView ? '100vw' : (paymentStatus === PAYMENT_STATUS.SUCCESS ? '95%' : 'min-content'),
+                boxShadow: '0 4px 6px rgb(0 0 0 / 10%), 0 1px 3px rgb(0 0 0 / 8%)',
+                height: isMobileView ? '100vh' : 'min-content'
             }}
         >
+        {<>
         {
             !(paymentStatus === PAYMENT_STATUS.SUCCESS) &&
             <PaymentElement/>
         }
         {
-            (paymentStatus === PAYMENT_STATUS.SUCCESS) && 
-            <Receipt products={products.current} ref={printRef}/>
+            (paymentStatus === PAYMENT_STATUS.SUCCESS) &&
+                <Receipt products={products.current} ref={printRef}/>
         }
         <Box sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            flexDirection: isMobileView ? 'column': 'row'
         }}>
             <Button 
                 disabled={!(stripe && elements && !(paymentStatus === PAYMENT_STATUS.SUCCESS || paymentStatus === PAYMENT_STATUS.PROCESSING))} 
                 startIcon={
-                    (paymentStatus === PAYMENT_STATUS.PROCESSING && <RunningWithErrorsOutlined sx={{
-                        animation: 'rotation 2s infinite linear',
-                        '@keyframes rotation': {
-                            'from': {
-                            transform: 'rotate(0deg)'
-                            },
-                            'to': {
-                            transform: 'rotate(359deg)'
-                            }
-                        }
-                    }}/> ) ||
+                    (paymentStatus === PAYMENT_STATUS.PROCESSING && <CircularProgress
+                        size={30}
+                        color="secondary"
+                        // style={{ position: "absolute"}}
+                      /> ) ||
                     (paymentStatus === PAYMENT_STATUS.PAY_NOW && <EnhancedEncryptionOutlined /> ) ||
                     (paymentStatus === PAYMENT_STATUS.RETRY && <Replay /> ) ||
                     (paymentStatus === PAYMENT_STATUS.FAILED && <GppBadOutlined />) ||
@@ -253,7 +260,7 @@ const CheckoutForm = (props: any) => {
             }
         </Box>
         
-            
+        </>}
         </Stack>
         {/* <Button variant="contained" color="success"  sx={{textAlign: 'left', marginTop: '10px'}} disabled={!stripe}>
             Pay now
@@ -269,6 +276,12 @@ const Component = () => {
     const [paymentStatus, setPaymentStatus] = useState(PAYMENT_STATUS.PAY_NOW);
     const [retry, setRetry] = useState(0);
     const stripePromise = loadStripe('pk_test_51KZBqmSCKnbKzuc35ilsGw3OGk1dmrm17gEcdsE0MLzcWwas0uDWelAWqHZa7yqBvuDzznznl584Pibq9KEmOcMw00p62JM0f1');
+    const [isLoading, setLoadingState] = useState<boolean>(true);
+    useEffect(() => {
+        setTimeout(() => {
+            setLoadingState(false);
+        }, 3000);
+    }, []);
     useEffect(() => { 
         const processor = async () => {
             setRetry(retry + 1);
@@ -288,17 +301,27 @@ const Component = () => {
         }
     }, [paymentStatus]);
     const options = {
-        clientSecret: paymentIntent?.clientSecret,
-        paymentMethodTypes: ['card', 'sepa_debit', 'ideal', 'fpx'],
+        clientSecret: paymentIntent?.clientSecret
     };
     return (
         <StyledComponent>
+            {isLoading && <CircularProgress
+                        size={30}
+                        color="secondary"
+                        style={{ position: "absolute"}}
+                      />}
             {
-                paymentIntent 
+
+                !isLoading && paymentIntent 
                 && 
                 <Box sx={{
                     padding: '10px',
                     // maxWidth: '500px'
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '80vh',
+                    width: '100vw'
                 }}>
                 {
                     <Elements stripe={stripePromise} options={options}>

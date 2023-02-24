@@ -2,7 +2,9 @@ import {useState, useEffect, useContext} from "react";
 import { 
     Box,
     Typography,
-    Button
+    Button,
+    useTheme,
+    useMediaQuery
 } from "@mui/material";
 import { 
     DeleteOutlineOutlined,
@@ -33,10 +35,12 @@ const StyledComponent = styled('div')({
 
 
 const Component = (props: any) => {
+    const theme = useTheme();
+    const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
     const cartContext = useContext(CartContext);
     const [cartDeletionStatus, setCartDeletionStatus] = useState<STATUS>(STATUS.NOT_STARTED);
     const navigate = useNavigate();
-    
+    console.log("checking", props.cart)
     return (
         <StyledComponent>
             <Box
@@ -47,11 +51,11 @@ const Component = (props: any) => {
                     alignItems: 'center',
                     justifyContent: 'end',
                     overyflowY: 'scroll',
-                    width: '100%'
+                    width: '90vw'
                 }}
             >
             { 
-                props.cart?.map((currCartItem: any) => {
+                cartContext?.cart?.map((currCartItem: any) => {
                     return (<CartItem 
                         cartItem={currCartItem}
                     />)
@@ -62,9 +66,7 @@ const Component = (props: any) => {
                 sx={{
                     height: 'calc(100vh-52px)',
                     display: 'flex',
-                    justifyContent: 'end',
-                    width: '45%',
-                    padding: '5px 20px',
+                    width: '94vw',
                     flexDirection:'column'
                 }}
             >
@@ -72,14 +74,14 @@ const Component = (props: any) => {
                 <pre><b>Total cost (in Rs) : </b> {cartContext?.totalCost}</pre>
             </Typography>
             <Box sx={{
-                width: '510px',
+                width: isMobileView ? '94vw' : '500px',
                 display: 'flex',
                 justifyContent: 'space-between'
             }}>
                 <Button 
                     variant="contained" 
                     color="success"  
-                    sx={{textAlign: 'left', width: '250px'}}
+                    sx={{textAlign: 'left', width: '49%'}}
                     onClick={() => {
                         navigate('/payment');
                     }}
@@ -92,7 +94,7 @@ const Component = (props: any) => {
                     color="error"
                     onClick={async () => {
                         setCartDeletionStatus(STATUS.PROCESSING);
-                        const deleteStatus = cartContext?.deleteCart;
+                        const deleteStatus = cartContext?.deleteCart();
                         if(deleteStatus) {
                             setCartDeletionStatus(STATUS.SUCCESS);
                             navigate('/')
@@ -102,7 +104,7 @@ const Component = (props: any) => {
                     }}
                     disabled={cartDeletionStatus !== STATUS.NOT_STARTED}
                     sx={{
-                        width: '250px'
+                        width: '49%'
                     }}
                 >
                     <TextIcon 
@@ -110,10 +112,10 @@ const Component = (props: any) => {
                         sx={{color: 'white'}} />} 
                         iconPosition={PositionType.Right} 
                         text={
-                            (cartDeletionStatus === STATUS.SUCCESS && "Cart deletion successfull") ||
-                            (cartDeletionStatus === STATUS.FAILED && "Failure in deletion of cart") ||
-                            (cartDeletionStatus === STATUS.PROCESSING && "Processing your cart...") ||
-                            "Delete your cart"
+                            (cartDeletionStatus === STATUS.SUCCESS && "Success") ||
+                            (cartDeletionStatus === STATUS.FAILED && "Failed") ||
+                            (cartDeletionStatus === STATUS.PROCESSING &&  "Processing") ||
+                            "Empty"
                         } 
                     />
                 </Button>

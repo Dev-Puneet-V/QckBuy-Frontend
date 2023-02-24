@@ -33,14 +33,14 @@ const Component = (props: any) => {
     const [updateStatus, setCartUpdateStatus] = useState<STATUS>(STATUS.NOT_STARTED);
     const reduceFromCartHandler = async () => {
         setCartUpdateStatus(STATUS.PROCESSING);
-        const status = await  cartContext?.updateProductInCart(props.cartItem?._id, true);
+        const status = await cartContext?.updateProductInCart(props.cartItem?.product?._id, false);
         status && setProductCountInCart(productCountInCart - 1);
         setCartUpdateStatus(STATUS.NOT_STARTED);
     }
     
     const addToCartHandler = async () => {
         setCartUpdateStatus(STATUS.PROCESSING);
-        const status = await cartContext?.updateProductInCart(props.cartItem?._id, false);
+        const status = await cartContext?.updateProductInCart(props.cartItem?.product?._id, true);
         status && setProductCountInCart(productCountInCart + 1);
         setCartUpdateStatus(STATUS.NOT_STARTED);
     }

@@ -86,7 +86,7 @@ import { CartContext } from "../../../contexts/Cart";
                     flexDirection: 'row',
                     alignItems: 'center'
                 }}>
-                    <Rating name="read-only" value={ratings || 0} readOnly />
+                   {ratings !== 0 && <Rating name="read-only" value={ratings || 0} readOnly /> }
                     {
                         !reviewBoxStatus && ratings > 0 && <TextIcon
                             icon={
@@ -122,8 +122,8 @@ import { CartContext } from "../../../contexts/Cart";
                 <Box sx={{
                             padding: '5px 5px 5px 0px',
                             position: `${quantity > 0 && 'absolute'}`,
-                            bottom: 0
-                        }}>
+                            bottom: '-60px',
+                        }}> 
                             <Button color={
                                     (cartUpdateStatus === STATUS.NOT_STARTED && 'secondary') ||
                                     (cartUpdateStatus === STATUS.PROCESSING && 'primary') ||
@@ -131,7 +131,7 @@ import { CartContext } from "../../../contexts/Cart";
                                     'success'
                                 } 
                                 variant="contained" 
-                                disabled={quantity === 0 || cartUpdateStatus !== STATUS.NOT_STARTED} 
+                                disabled={quantity === 0 || cartUpdateStatus === STATUS.PROCESSING} 
                                 onClick={async () => {
                                     setCartUpdateStatus(STATUS.PROCESSING);
                                     const cartStatus = await cartContext?.updateProductInCart(id, true);

@@ -52,6 +52,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 
 const StyledComponent = styled('div')({
+    diplay: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '95%'
 });
 
 

@@ -39,9 +39,9 @@ const CartState = (props: any) => {
                 cookies.token
             );
             if(data.success){
-                let exists = false
+                let exists = false;
                 setCart((prevCartItems: any) => {
-                    return prevCartItems.map((item: any) => {
+                    return prevCartItems?.map((item: any) => {
                         if(item.quantity === 0 && !toIncrement){
                             throw new Error('Product out of range')
                         }
@@ -55,13 +55,19 @@ const CartState = (props: any) => {
                     }
                     return item;
                     });
+                    
                 });
+                
                 if(!exists){
-                    setCart(data.cart)
+                    let newData = [{
+                        "product": data.cartItems[0].product,
+                        "quantity": 1
+                    }]
+                    setCart(newData)
                 }
                 return true;
             }else{
-                throw new Error('Problem decrementing product from cart');
+                throw new Error(`Problem  ${toIncrement ? 'incrementing' : 'decrementing'} product from cart`);
             }
         }catch(error: any){
             console.error(error.message);
@@ -70,15 +76,17 @@ const CartState = (props: any) => {
     });
 
     const totalCartCost = () => {
-        if(cart.length === 0){
+        if(!cart || cart.length === 0){
             return 0;
         }
-        console.log(cart)
-        const cost = cart.reduce(
+        cart.map(currentValue => {
+            console.log(currentValue?.quantity, currentValue?.product.price)
+        })
+        const cost = cart?.reduce(
             (accumulator: number, currentValue: any) => accumulator + currentValue?.quantity * currentValue?.product.price,
             0
         );
-        console.log(cost)
+        console.log(cost, "cost")
         return cost;
     }
     
