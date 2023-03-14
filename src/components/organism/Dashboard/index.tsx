@@ -17,8 +17,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { ThemeProvider } from '@mui/material/styles';
-import { Card } from '@mui/material';
+import { Button, Card } from '@mui/material';
 import {darkTheme} from '../../../theme';
+import { ExitToApp } from '@mui/icons-material';
+import { useCookies } from 'react-cookie';
+import { UserContext } from '../../../contexts/User';
+import { useNavigate } from 'react-router-dom';
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -115,11 +119,12 @@ const Component = (props: DashboardPropsType) => {
     } = props;
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-
+  const [cookies, setCookie, removeCookie] = useCookies(['token']);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
-
+  const userContext = React.useContext(UserContext);
+ const navigate = useNavigate();
   const handleDrawerClose = () => {
     setOpen(false);
   };
@@ -128,6 +133,11 @@ const Component = (props: DashboardPropsType) => {
     setSelectedState(index);
     stateHandlerList.length > index && stateHandlerList[index]();
   }
+  const handleLogout = () => {
+    userContext?.setUser(undefined);
+    removeCookie("token");
+    navigate("/login");
+  };
   return (
     <ThemeProvider theme={darkTheme}>
         <Box sx={{ display: 'flex' }}>
@@ -146,9 +156,21 @@ const Component = (props: DashboardPropsType) => {
             >
                 <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div" >
-                {navList[selectedState]}
-            </Typography>
+            <Box sx={{width: "calc(100vw - 50px)", display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Typography variant="h6" noWrap component="div" >
+                  {navList[selectedState]}
+              </Typography>
+              
+              <Button
+              variant="contained"
+              color="secondary"
+              // className={classes.logoutButton}
+              onClick={handleLogout}
+              endIcon={<ExitToApp />}
+              >
+              Logout
+            </Button>
+            </Box>
             </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open} sx={{p: 0}}>

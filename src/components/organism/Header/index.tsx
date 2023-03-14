@@ -13,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "../../../contexts/Cart";
+import { UserContext } from "../../../contexts/User";
 const useStyles = makeStyles((headerTheme) => ({
     appBar: {
       zIndex: headerTheme.zIndex.drawer + 1,
@@ -67,7 +68,9 @@ const Header = () => {
   const [cookies,, removeCookie] = useCookies(["token"]);
   const navigate = useNavigate();
   const cartContext = useContext(CartContext);
+  const userContext = useContext(UserContext);
   const handleLogout = () => {
+    userContext?.setUser(undefined);
     removeCookie("token");
     navigate("/login");
   };
@@ -101,6 +104,7 @@ const Header = () => {
             <Button
             color="inherit"
             className={classes.profileButton}
+            onClick={() => {navigate('/dashboard')}}
             >
             <AccountCircle />
             </Button>

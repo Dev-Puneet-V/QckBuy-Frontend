@@ -17,8 +17,14 @@ const LOGOUT_REQUEST = {
     url: `${USER_BASE_URL}/logout`
 }
 
+const UPDATE_USER_REQUEST = {
+    type: REQUEST_TYPE.PATCH,
+    url: `${USER_BASE_URL}/profile/update`
+}
+
 export {
     LOGIN_REQUEST,
     SIGNUP_REQUEST,
-    LOGOUT_REQUEST
+    LOGOUT_REQUEST,
+    UPDATE_USER_REQUEST
 }

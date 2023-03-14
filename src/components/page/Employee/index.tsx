@@ -12,15 +12,16 @@ import { TablePropsType } from '../../molecule/Table';
 import Modal from '../../molecule/Modal';
 import { STATUS } from '../../../type';
 import { useCookies } from 'react-cookie';
+import UserProfile from '../UserProfile';
 const Component = (props: any) => {
-  const cookies = useCookies(['token']);
+  
+  const [cookies] = useCookies(['token']);
   const [historyData, setHistoryData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
   const [availableOrdersData, setAvailableOrdersData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
   const [acceptedOrdersData, setAcceptedOrdersData] = React.useState<TablePropsType>({"columns" : [{"name" : "Items"}], "rows": [[{"value": "No items exists"}]]});
   const [otpModalVerificationState, setOtpModalVerificationState] = React.useState<boolean>(false);
   const [otp, setOtp] = React.useState<string>("");
   const [otpVerifcationState, setOtpVerficationState] = React.useState<STATUS>(STATUS.NOT_STARTED);
-//   const []
   const otpFieldRef = React.useRef<any>();
   const [orderId, setOrderId] = React.useState<string | undefined>();
   otpFieldRef.current = { value: '' };
@@ -127,16 +128,17 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
 
     const ProfileComponent = (params: any) => {
         return <>
-            <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
+            <UserProfile />
+            {/* <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
                  <Card sx={{height : '300px', w: '300px', m: 5}}>
                 <VictoryPie
                     colorScale={["tomato", "orange", "gold", "cyan", "navy" ]}
                     data={[
-                    { x: "1 Star", y: 5 },
-                    { x: "2 Star", y: 15 },
-                    { x: "3 Star", y: 35 },
-                    { x: "4 Star", y: 5 },
-                    { x: "5 Star", y: 40 }
+                        { x: "1 Star", y: 5 },
+                        { x: "2 Star", y: 15 },
+                        { x: "3 Star", y: 35 },
+                        { x: "4 Star", y: 5 },
+                        { x: "5 Star", y: 40 }
                     ]}
                 />
                 </Card>
@@ -145,8 +147,8 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
                     >
                     <VictoryLine
                         style={{
-                        data: { stroke: 'lightgrey' },
-                        parent: { border: "0.1px solid black"}
+                            data: { stroke: 'lightgrey' },
+                            parent: { border: "0.1px solid black"}
                         }}
                         data={[
                         { x: 1, y: 1 },
@@ -173,7 +175,7 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
                     />
                     </VictoryChart>
                 </Card>
-            </Box>
+            </Box> */}
         </>        
     }
     const AvailableOrdersComponent = (profileProps: any) => {

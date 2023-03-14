@@ -25,6 +25,7 @@ import { Country, State, City }  from 'country-state-city';
 import TypeAheadInput from '../../molecule/TypeAheadInput';
 import { Route, Navigate, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
+import {UserContext} from '../../../contexts/User';
 const useStyles = makeStyles((theme) => ({
     parent: {
         display: 'flex',
@@ -108,6 +109,7 @@ const Component = () => {
   const [role, setRole] = React.useState('');
   const [address, setAddress] = React.useState(addressSchema);
   const [cookies, setCookie] = useCookies(['token']);
+  const userContext = React.useContext(UserContext);
   const handleTabState = (currTabState: string) => {
     setTabState(currTabState);
 }
@@ -158,6 +160,9 @@ React.useEffect(() => {
                 setTimeout(() => {
                     setProcessingState(STATUS.NOT_STARTED);
                     setCookie('token', data.token, { expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) });
+                    setCookie('user', JSON.stringify(data.user), { expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) });
+                    // userContext?.setUser(data.user);
+                    console.log('user info', data.user)
                 }, 100);
             }
         } 
@@ -204,19 +209,6 @@ React.useEffect(() => {
         }catch(error){
             console.log(error)
         }
-        // }else{
-        //     console.log({
-        //         "email": email,
-        //         "password": password,
-        //         "name": name,
-        //         "exactAddress": address.exactAddress,
-        //         "region": address.state,
-        //         "city": address.city,
-        //         "applicationFor": (role && (role === 'manager' || role === 'employee')) ? role : undefined,
-        //         "phoneNumber": '+' + country?.phoneCode + ' ' + address.phoneNumber,
-        //         "country": address.country,   
-        //     })
-        // }
     } 
   };
 
@@ -293,6 +285,13 @@ React.useEffect(() => {
                             <ProcessingIndicator state={processingStatus} initialText={USER_AUTHENTICATION_TAB_DATA[0].value}/>
                         </Button>
                     </form>
+                    {
+                        <Button onClick={() => {
+                            navigate('/forget-password')
+                        }}>
+                            Forget password?
+                        </Button>
+                    }
                 </>
             }
             {

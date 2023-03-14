@@ -25,8 +25,9 @@ import {
     EmployeeState
 } from '../../../contexts/Employee';
 import { useCookies } from "react-cookie";
+import UserProfile from "../UserProfile";
 const Component = (props: any) => {
-    const cookies = useCookies(['token']);
+    const [cookies] = useCookies(['token']);
     const inputRef = React.useRef<{ productSearchHandler: (event: React.SyntheticEvent) => void }>();
     const [products, setProducts] = React.useState<any>([]);
     const [state, setState] = React.useState<STATUS>(STATUS.NOT_STARTED);
@@ -48,6 +49,7 @@ const Component = (props: any) => {
 
     const ProfileComponent = () => {
         return <>
+            <UserProfile />
         </>
     }
 

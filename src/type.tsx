@@ -65,12 +65,24 @@ const USER_AUTHENTICATION_TAB_DATA = [
     }
 ]
 
+const USER_ORDER_TYPE_TAB_DATA = [
+    {
+        'value': 'undelivered',
+        'label': 'Not delivered'
+    },
+    {
+        'value': 'delivered',
+        'label': 'Delivered'
+    }
+]
+
 export {
     STATUS,
     REQUEST_TYPE,
     TABLE_COLUMN_TYPE,
     EMPLOYEE_TAB_DATA,
-    USER_AUTHENTICATION_TAB_DATA
+    USER_AUTHENTICATION_TAB_DATA,
+    USER_ORDER_TYPE_TAB_DATA
 };
 export type {
     ReviewType,

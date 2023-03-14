@@ -1,4 +1,4 @@
-import React, { useState, useEffect }  from 'react';
+import React, { useState, useEffect, useContext }  from 'react';
 import Header from './components/organism/Header';
 import Home from './components/page/Home';
 import Product from './components/page/Product';
@@ -13,20 +13,30 @@ import PrivateRoute from './components/molecule/PrivateRoute';
 import DefaultLayout from './components/template/DefaultLayout';
 import { useCookies } from 'react-cookie';
 import { CartState } from './contexts/Cart';
+import ForgetPassword from './components/organism/ForgetPassword';
+import ResetPassword from './components/organism/ResetPassword';
+import User from './components/page/User';
+import { UserContext } from './contexts/User';
 interface AuthType {
   isAuthenticated: boolean;
   user?: any
 }
 function App() {
   const navigate = useNavigate();
-  const [cookies] = useCookies(['token']);
+  const [cookies, setCookie, removeCookie] = useCookies(['token', 'user']);
   const [isLoading, setIsLoading] = React.useState(true);
   const [auth, setAuth] = React.useState<AuthType>({isAuthenticated: cookies.token ? true : false}); 
+  const userContext = useContext(UserContext);
   const checkAuthentication = () => {
     if(!cookies.token){
+      // if(userContext?.user){
+      //   // userContext?.setUser(undefined);
+      // }
+      removeCookie('user');
       navigate('/login');
       setAuth({isAuthenticated: false});
     } else {
+      // userContext?.setUser(JSON.parse(cookies?.user));
       setAuth({ isAuthenticated: true });
     }
   };
@@ -39,9 +49,8 @@ function App() {
       {/* <Header /> */}
         <CartState>
             <Routes>
-            <Route element={<PrivateRoute isAuthenticated={auth.isAuthenticated}/>}>
-            <Route element={<DefaultLayout />}>
-                
+              <Route element={<PrivateRoute isAuthenticated={auth.isAuthenticated}/>}>
+                <Route element={<DefaultLayout />}>
                     <Route index element={<Home />} />
                     <Route path="product">
                         <Route path=":id" element={<Product />} />
@@ -49,13 +58,16 @@ function App() {
                     <Route path="payment" element={<Payment />} />
                     <Route path="cart" element={<Cart />} />
                     <Route path="confirm" element={<OrderConfirm/>} />
-                <Route path='dashboard'>
-                <Route path="employee" element={<Employee />} />
-                <Route path="admin" element={<Admin />} />
-            </Route>
-            </Route>
-            </Route>
-            <Route path="login" element={<Authentication />} />
+                </Route>
+                <Route path='dashboard' element={
+                       (cookies?.user?.role === 'employee' && <Employee />) || 
+                       (cookies?.user?.role === 'admin' && <Admin />) ||
+                       (cookies?.user?.role === 'user' && <User />)
+                    } />
+              </Route>
+              <Route path="login" element={<Authentication />} />
+              <Route path="forget-password" element={<ForgetPassword />} />
+              <Route path="reset-password/:id" element={<ResetPassword />} />
             </Routes>
         </CartState>
     </div>
