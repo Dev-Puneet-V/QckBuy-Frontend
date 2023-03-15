@@ -35,7 +35,7 @@ const Component = (props: any) => {
     useEffect(() => {
         const processor = async () => {
             if(redirectStatus === 'succeeded'){
-                let data = await request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/payment/stripe/paymentSuccess/${paymentIntentId}`, cookies.token);
+                let data = await request(REQUEST_TYPE.GET, `${process.env.REACT_APP_API_BASE_URL}/payment/stripe/paymentSuccess/${paymentIntentId}`, cookies.token);
                 if(data?.success){
                     setPaymentStatus(PostPaymentStatus.DONE);
                 }else{

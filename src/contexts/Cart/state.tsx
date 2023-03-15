@@ -14,7 +14,7 @@ const CartState = (props: any) => {
     const [totalQuantity, setTotalQuantity] = React.useState<number>(0);
     
     const updateCartData: Function = () => {
-        request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/user/cart`, cookies.token).then(data => {
+        request(REQUEST_TYPE.GET, `${process.env.REACT_APP_API_BASE_URL}/user/cart`, cookies.token).then(data => {
             if(data?.success){
                 setCart(data.cartItems);
             }
@@ -40,7 +40,7 @@ const CartState = (props: any) => {
         try{
             const data = await request(
                 toIncrement ? REQUEST_TYPE.POST : REQUEST_TYPE.PATCH, 
-                `http://localhost:4000/api/v1/user/cart/${productId}`, 
+                `${process.env.REACT_APP_API_BASE_URL}/user/cart/${productId}`, 
                 cookies.token
             );
             if(data?.success){
@@ -99,7 +99,7 @@ const CartState = (props: any) => {
         try{
             const data = await request(
                 REQUEST_TYPE.DELETE, 
-                `http://localhost:4000/api/v1/user/cart`,
+                `${process.env.REACT_APP_API_BASE_URL}/user/cart`,
                 cookies.token
             );
             if(data?.success){

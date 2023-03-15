@@ -29,7 +29,7 @@ const Component = (props: any) => {
     const processor = async () => {
       let data = await request(
         REQUEST_TYPE.GET,
-        `http://localhost:4000/api/v1/product/${id}`,
+        `${process.env.REACT_APP_API_BASE_URL}/product/${id}`,
         cookies.token
       );
       const productInfo = data.product;

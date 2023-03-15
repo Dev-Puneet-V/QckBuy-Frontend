@@ -96,7 +96,7 @@ const Component = (props: any) => {
 const orderAcceptHandler = async (orderId: string, currRow: any) => {
     const data = await request(
         REQUEST_TYPE.POST,
-        `http://localhost:4000/api/v1/order/accept/${orderId}`,
+        `${process.env.REACT_APP_API_BASE_URL}/order/accept/${orderId}`,
         cookies.token
     )
     if(data?.success){
@@ -117,7 +117,7 @@ const orderAcceptHandler = async (orderId: string, currRow: any) => {
 const deliveryHandler = async (orderId: string,currRow: any) => {
     const data = await request(
         REQUEST_TYPE.GET,
-        `http://localhost:4000/api/v1/order/delivery/initiate/${orderId}`,
+        `${process.env.REACT_APP_API_BASE_URL}/order/delivery/initiate/${orderId}`,
         cookies.token
     );
     if(data?.success){
@@ -197,13 +197,13 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
     const profileFunction = () => {    
     }
     const availableOrdersFunction = () => {
-        getData('http://localhost:4000/api/v1/dashboard/employee/available-order', 1);     
+        getData('${process.env.REACT_APP_API_BASE_URL}/dashboard/employee/available-order', 1);     
     }
     const acceptedOrdersFunction = () => {
-        getData('http://localhost:4000/api/v1/dashboard/employee/accepted-order', 2);   
+        getData('${process.env.REACT_APP_API_BASE_URL}/dashboard/employee/accepted-order', 2);   
     }
     const historyFunction = () => {
-        getData('http://localhost:4000/api/v1/dashboard/employee/history', 3);       
+        getData('${process.env.REACT_APP_API_BASE_URL}/dashboard/employee/history', 3);       
     }
     const otpHandler = (e: React.SyntheticEvent) =>{
         let target = e.target as HTMLInputElement;
@@ -216,7 +216,7 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
         setOtpVerficationState(STATUS.PROCESSING);
         const data = await request(
             REQUEST_TYPE.POST,
-            `http://localhost:4000/api/v1/order/delivery/proceed/${orderId}`,
+            `${process.env.REACT_APP_API_BASE_URL}/order/delivery/proceed/${orderId}`,
             cookies.token,
             {
                 "otp": otp
