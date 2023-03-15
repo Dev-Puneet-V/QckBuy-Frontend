@@ -74,7 +74,7 @@ const EmployeeCard = (props: any) => {
             role: 'ex-'+employeeType
         }
     )
-    if(data.success){
+    if(data?.success){
         setProcessingStatus(STATUS.SUCCESS);
         negateEmployee();
         handleClose();
@@ -92,7 +92,7 @@ const EmployeeCard = (props: any) => {
           conversionFor: applicationFor
         }
     )
-    if(data.success){
+    if(data?.success){
         setProcessingStatus(STATUS.SUCCESS);
         verifyEmployee();
         handleClose();

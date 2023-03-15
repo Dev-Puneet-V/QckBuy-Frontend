@@ -50,8 +50,8 @@ const AddProductForm = (props: any) => {
         productData,
         fileData
     );
-    setProuctAddtionState(data.success ? STATUS.SUCCESS: STATUS.FAILED);
-    if(data.success){
+    setProuctAddtionState(data?.success ? STATUS.SUCCESS: STATUS.FAILED);
+    if(data?.success){
         productHandler(data.product);
     }
   }

@@ -27,7 +27,7 @@ const Component = (props: any) => {
   otpFieldRef.current = { value: '' };
   const getData = async (url: string, index: number) => {
     const data = await request(REQUEST_TYPE.GET, url, cookies.token)
-    if(data.success && data?.data && data?.data?.length > 0){
+    if(data?.success && data?.data && data?.data?.length > 0){
         let columns: TablePropsType["columns"] = [];
         Object.keys(data?.data[0]).forEach((key: string) => {
             if(key === '_id'){
@@ -99,7 +99,7 @@ const orderAcceptHandler = async (orderId: string, currRow: any) => {
         `http://localhost:4000/api/v1/order/accept/${orderId}`,
         cookies.token
     )
-    if(data.success){
+    if(data?.success){
         setAvailableOrdersData(prevAvailableOrdersData => {
             console.log(prevAvailableOrdersData)
             let newRowList = [...prevAvailableOrdersData.rows].filter((row: any) => {
@@ -120,7 +120,7 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
         `http://localhost:4000/api/v1/order/delivery/initiate/${orderId}`,
         cookies.token
     );
-    if(data.success){
+    if(data?.success){
         setOrderId(orderId);
         setOtpModalVerificationState(true);
     }
@@ -222,8 +222,8 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
                 "otp": otp
             }
         )
-        setOtpVerficationState(data.success ? STATUS.SUCCESS : STATUS.FAILED);
-        if(data.success){
+        setOtpVerficationState(data?.success ? STATUS.SUCCESS : STATUS.FAILED);
+        if(data?.success){
             setAcceptedOrdersData((prevAcceptedeOrdersData: any) => {
                 let newRowList = [...prevAcceptedeOrdersData.rows].filter((row: any) => {
                     return row[0].value !== orderId

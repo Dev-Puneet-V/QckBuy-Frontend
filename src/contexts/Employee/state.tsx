@@ -19,7 +19,7 @@ const EmployeeState = (props: any) => {
                 isApplicant: true
             }
         ).then(data => {
-            if(data && data.success){
+            if(data && data?.success){
                 setEmployees(data.users);
             }
         })    

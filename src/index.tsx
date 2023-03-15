@@ -7,13 +7,14 @@ import { BrowserRouter} from "react-router-dom";
 import {
   UserState
 } from './contexts/User';
+import { createBrowserHistory } from 'history';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <CookiesProvider>
     <UserState>
-      <BrowserRouter>
+      <BrowserRouter >
         <App />
       </BrowserRouter>
     </UserState>

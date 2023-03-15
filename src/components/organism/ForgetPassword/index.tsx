@@ -29,7 +29,7 @@ const Component = () => {
                 email: email
             }
         );
-        if(data.success){
+        if(data?.success){
             setProcessingStatus(STATUS.SUCCESS);
         }else{
             setProcessingStatus(STATUS.FAILED);

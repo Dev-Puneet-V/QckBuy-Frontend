@@ -155,8 +155,8 @@ React.useEffect(() => {
                     "password": password
                 }
             );
-            setProcessingState(data.success ? STATUS.SUCCESS: STATUS.FAILED);
-            if(data.success){
+            setProcessingState(data?.success ? STATUS.SUCCESS: STATUS.FAILED);
+            if(data?.success){
                 setTimeout(() => {
                     setProcessingState(STATUS.NOT_STARTED);
                     setCookie('token', data.token, { expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) });
@@ -199,8 +199,8 @@ React.useEffect(() => {
                     "postalCode": address.postalCode
                 }
             );
-            setProcessingState(data.success ? STATUS.SUCCESS: STATUS.FAILED);
-            if(data.success){
+            setProcessingState(data?.success ? STATUS.SUCCESS: STATUS.FAILED);
+            if(data?.success){
                 setTimeout(() => {
                     setProcessingState(STATUS.NOT_STARTED);
                     setCookie('token', data.token, { expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) });

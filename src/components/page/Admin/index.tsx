@@ -41,7 +41,7 @@ const Component = (props: any) => {
             `${process.env.REACT_APP_API_BASE_URL}/product/admin`,
             cookies.token
         ).then(data => {
-            if(data && data.success){
+            if(data && data?.success){
                 setProducts(data.products);
             }
         })

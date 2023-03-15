@@ -65,7 +65,7 @@ const ProductInfo = ({ product }) => {
         cookies.token,
         reqBody
     );
-    if(data.success){
+    if(data?.success){
         console.log(data)
     }
   };

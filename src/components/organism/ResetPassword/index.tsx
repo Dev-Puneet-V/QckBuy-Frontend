@@ -40,7 +40,7 @@ const Component = () => {
                 confirmPassword: confirmPassword
             }
         );
-        if(data.success){
+        if(data?.success){
             console.log('Helllo')
             setProcessingStatus(STATUS.SUCCESS);
             // navigate('/');

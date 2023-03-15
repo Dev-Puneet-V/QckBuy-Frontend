@@ -36,7 +36,7 @@ const Component = (props: any) => {
         const processor = async () => {
             if(redirectStatus === 'succeeded'){
                 let data = await request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/payment/stripe/paymentSuccess/${paymentIntentId}`, cookies.token);
-                if(data.success){
+                if(data?.success){
                     setPaymentStatus(PostPaymentStatus.DONE);
                 }else{
                     setPaymentStatus(PostPaymentStatus.FAILED);

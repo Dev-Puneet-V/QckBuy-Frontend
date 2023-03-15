@@ -250,8 +250,8 @@ const UserProfile = () => {
             ...formData
         }
     );
-    setProcessingState(data.success ? STATUS.SUCCESS: STATUS.FAILED);
-    if(data.success){
+    setProcessingState(data?.success ? STATUS.SUCCESS: STATUS.FAILED);
+    if(data?.success){
         // setTimeout(() => {
         //     // setProcessingState(STATUS.NOT_STARTED);
         // }, 10000);

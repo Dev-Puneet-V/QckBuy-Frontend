@@ -17,6 +17,9 @@ import ForgetPassword from './components/organism/ForgetPassword';
 import ResetPassword from './components/organism/ResetPassword';
 import User from './components/page/User';
 import { UserContext } from './contexts/User';
+import TooManyRequests from './components/page/TooManyRequests';
+import { getCookie } from './hooks';
+import Cookies from 'js-cookie';
 interface AuthType {
   isAuthenticated: boolean;
   user?: any
@@ -47,7 +50,10 @@ function App() {
   return (
     <div className="App">
       {/* <Header /> */}
-        <CartState>
+        { 
+         Cookies.get('reloadFlag') && <TooManyRequests /> 
+        }
+        { !Cookies.get('reloadFlag') && <CartState>
             <Routes>
               <Route element={<PrivateRoute isAuthenticated={auth.isAuthenticated}/>}>
                 <Route element={<DefaultLayout />}>
@@ -68,8 +74,10 @@ function App() {
               <Route path="login" element={<Authentication />} />
               <Route path="forget-password" element={<ForgetPassword />} />
               <Route path="reset-password/:id" element={<ResetPassword />} />
+              <Route path="too-many-requests" element={<TooManyRequests />}/>
             </Routes>
         </CartState>
+      }
     </div>
   );
 }

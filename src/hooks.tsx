@@ -1,5 +1,6 @@
 import BigPromise from "./bigPromise";
-import { useCookies } from 'react-cookie';
+import { createBrowserHistory, History } from 'history';
+import Cookies from 'js-cookie';
 enum REQUEST_TYPE {
     POST,
     PATCH,
@@ -11,8 +12,9 @@ enum REQUEST_TYPE {
 interface JSONDataType {
     [key: string]: any;
 }
-
+const history: History = createBrowserHistory();
 const request = BigPromise(async (request_type: REQUEST_TYPE, request_url: URL, bearer_token?: String, bodyData?: Object, fileData?: any ) => {
+    
     const formData = new FormData();
     if(fileData){
       fileData.forEach((file: File, index: number) => {
@@ -33,10 +35,30 @@ const request = BigPromise(async (request_type: REQUEST_TYPE, request_url: URL, 
     if(request_type !== REQUEST_TYPE.GET){
       parameters['body'] = formData;
     }
-    
-    let response = await fetch(request_url, parameters);
-    let data = await response.json();
-    return data;
+    if (!Cookies.get('reloadFlag')) {
+      let response = await fetch(request_url, parameters);
+      if(response.status === 429){
+        const retryAfter = response.headers.get('Retry-After');
+        console.log(retryAfter, 'retry after')
+        // if (!getCookie('reloadFlag')) {
+            const expires = new Date(Date.now() + parseInt(retryAfter || '0') * 1000);
+            Cookies.set('reloadFlag', 'true', { expires });
+            // document.cookie = `reloadFlag=true;expires=${expires.toUTCString()};path=/`;
+            console.log(Cookies.get('reloadFlag'))
+            history.push('/too-many-requests');
+            window.location.reload();
+        // }
+        return;
+      }else{
+        document.cookie = 'reloadFlag=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;'; // remove the cookie
+      }
+      
+      let data = await response.json();
+      return data;
+    }else{
+      history.push('/too-many-requests');
+        window.location.reload();
+    }
 });
 
 const updateCart = BigPromise(async (increment: boolean, productId: String, next: any) => {
@@ -46,7 +68,7 @@ const updateCart = BigPromise(async (increment: boolean, productId: String, next
         process.env.REACT_APP_USER_TOKEN
     );
     next();
-    return data.success;
+    return data?.success;
 });
 const deleteCart = BigPromise(async (a?: any, b?: any, c?: any) => {
     let data = await request(
@@ -54,7 +76,7 @@ const deleteCart = BigPromise(async (a?: any, b?: any, c?: any) => {
         `http://localhost:4000/api/v1/user/cart/`,
         process.env.REACT_APP_USER_TOKEN
     );
-    return data.success;
+    return data?.success;
 });
 
 function isDate(sDate: any) {  
@@ -95,6 +117,24 @@ function nameValidator(value: string) {
   return undefined;
 }
 
+function getCookie(name: string) {
+  const cookieStr = decodeURIComponent(document.cookie);
+  const cookieArr = cookieStr.split(';');
+  
+  for(let i = 0; i < cookieArr.length; i++) {
+    const cookiePair = cookieArr[i].trim().split('=');
+    if (cookiePair[0] === name) {
+      return cookiePair[1];
+    }
+  }
+  
+  return null;
+}
+
+const setCookie = (name, value, expires, path) => {
+  document.cookie = `${name}=${value}; expires=${expires}; path=${path}`;
+};
+
 export {
     updateCart,
     REQUEST_TYPE,
@@ -103,5 +143,7 @@ export {
     isDate,
     isNumeric,
     filterData, 
-    jsonToArray
+    jsonToArray,
+    getCookie,
+    setCookie
 };

@@ -15,7 +15,7 @@ const CartState = (props: any) => {
     
     const updateCartData: Function = () => {
         request(REQUEST_TYPE.GET, `http://localhost:4000/api/v1/user/cart`, cookies.token).then(data => {
-            if(data.success){
+            if(data?.success){
                 setCart(data.cartItems);
             }
         });  
@@ -43,7 +43,7 @@ const CartState = (props: any) => {
                 `http://localhost:4000/api/v1/user/cart/${productId}`, 
                 cookies.token
             );
-            if(data.success){
+            if(data?.success){
                 let itemExists = false;
                 for (let i = 0; i < cart.length; i++) {
                     const item = cart[i];
@@ -102,7 +102,7 @@ const CartState = (props: any) => {
                 `http://localhost:4000/api/v1/user/cart`,
                 cookies.token
             );
-            if(data.success){
+            if(data?.success){
                 setCart([]);
             }else{
                 console.error("Error in deletion")
