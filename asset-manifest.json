@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.js": "/qckbuy/static/js/main.d5ed8f82.js",
+    "static/js/787.3b1c03a1.chunk.js": "/qckbuy/static/js/787.3b1c03a1.chunk.js",
+    "index.html": "/qckbuy/index.html",
+    "main.d5ed8f82.js.map": "/qckbuy/static/js/main.d5ed8f82.js.map",
+    "787.3b1c03a1.chunk.js.map": "/qckbuy/static/js/787.3b1c03a1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.d5ed8f82.js"
+  ]
+}
