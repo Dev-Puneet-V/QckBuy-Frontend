@@ -64,7 +64,7 @@ const request = BigPromise(async (request_type: REQUEST_TYPE, request_url: URL, 
 const updateCart = BigPromise(async (increment: boolean, productId: String, next: any) => {
     let data = await request(
         increment ? REQUEST_TYPE.POST : REQUEST_TYPE.PATCH, 
-        `${process.env.REACT_APP_API_BASE_URL}/user/cart/${productId}`, 
+        `https://qckbie-production.up.railway.app//user/cart/${productId}`, 
         process.env.REACT_APP_USER_TOKEN
     );
     next();
@@ -73,7 +73,7 @@ const updateCart = BigPromise(async (increment: boolean, productId: String, next
 const deleteCart = BigPromise(async (a?: any, b?: any, c?: any) => {
     let data = await request(
         REQUEST_TYPE.DELETE, 
-        `${process.env.REACT_APP_API_BASE_URL}/user/cart/`,
+        `https://qckbie-production.up.railway.app//user/cart/`,
         process.env.REACT_APP_USER_TOKEN
     );
     return data?.success;

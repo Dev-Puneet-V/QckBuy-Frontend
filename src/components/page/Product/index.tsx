@@ -29,7 +29,7 @@ const Component = (props: any) => {
     const processor = async () => {
       let data = await request(
         REQUEST_TYPE.GET,
-        `${process.env.REACT_APP_API_BASE_URL}/product/${id}`,
+        `https://qckbie-production.up.railway.app//product/${id}`,
         cookies.token
       );
       const productInfo = data.product;
