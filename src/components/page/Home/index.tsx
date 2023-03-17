@@ -53,7 +53,7 @@ const Component = () => {
  React.useEffect(() =>{
     const processor = async () => {
         let response = await fetch(
-          `https://qckbuy-production.up.railway.app/api/v1//product/?page=${currentPage}`
+          `https://qckbuy-production.up.railway.app/api/v1/product/?page=${currentPage}`
           );
         let data = await response.json();
         setTotalPage(Math.ceil(data.totalCountProduct / data.resultPerPage));

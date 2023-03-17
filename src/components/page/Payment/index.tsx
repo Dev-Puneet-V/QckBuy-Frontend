@@ -74,7 +74,7 @@ const CheckoutForm = (props: any) => {
         }
         const invoice = await request(
             REQUEST_TYPE.GET, 
-            `https://qckbuy-production.up.railway.app/api/v1//order/${paymentId}/invoice/true`, 
+            `https://qckbuy-production.up.railway.app/api/v1/order/${paymentId}/invoice/true`, 
             ' eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzZGRkOTZiMjQxNmIxOWJlMWVkYmVjNCIsImlhdCI6MTY3NTkzOTc0MiwiZXhwIjoxNjc2MDI2MTQyfQ.Hmzk6kN8KFbaayNMkl7RPfNHXrqo2T5cu12sBVidWFY'
         );
         console.log(invoice)
@@ -112,7 +112,7 @@ const CheckoutForm = (props: any) => {
     } else {
         if(result?.paymentIntent?.status === "succeeded"){
             
-            const postPaymentResponse = await request(REQUEST_TYPE.GET, `https://qckbuy-production.up.railway.app/api/v1//payment/stripe/paymentSuccess/${props.paymentIntentToken}`, cookies.token);
+            const postPaymentResponse = await request(REQUEST_TYPE.GET, `https://qckbuy-production.up.railway.app/api/v1/payment/stripe/paymentSuccess/${props.paymentIntentToken}`, cookies.token);
             // const postPaymentData = await postPaymentResponse.json();
             if(postPaymentResponse.success) {
                 cartContext?.deleteCart();
@@ -120,7 +120,7 @@ const CheckoutForm = (props: any) => {
                 setPaymentId(postPaymentResponse.paymentId);
             }
         }else{
-            const postPaymentResponse = await request(REQUEST_TYPE.GET, `https://qckbuy-production.up.railway.app/api/v1//payment/stripe/paymentFailure/${props.paymentIntentToken}`, cookies.token);
+            const postPaymentResponse = await request(REQUEST_TYPE.GET, `https://qckbuy-production.up.railway.app/api/v1/payment/stripe/paymentFailure/${props.paymentIntentToken}`, cookies.token);
             // const postPaymentData = await postPaymentResponse.json();
             if(postPaymentResponse.success) {
                 setPaymentStatus(PAYMENT_STATUS.FAILED);                
@@ -285,7 +285,7 @@ const Component = () => {
     useEffect(() => { 
         const processor = async () => {
             setRetry(retry + 1);
-            const paymentIntentResponse = await request(REQUEST_TYPE.POST, "https://qckbuy-production.up.railway.app/api/v1//payment/stripe/initiatePayment", cookies.token);
+            const paymentIntentResponse = await request(REQUEST_TYPE.POST, "https://qckbuy-production.up.railway.app/api/v1/payment/stripe/initiatePayment", cookies.token);
             if(paymentIntentResponse.success){
                 setPaymentIntent(paymentIntentResponse);
             }else{
