@@ -14,7 +14,7 @@ const CartState = (props: any) => {
     const [totalQuantity, setTotalQuantity] = React.useState<number>(0);
     
     const updateCartData: Function = () => {
-        request(REQUEST_TYPE.GET, `https://qckbie-production.up.railway.app//user/cart`, cookies.token).then(data => {
+        request(REQUEST_TYPE.GET, `https://qckbuy-production.up.railway.app/api/v1//user/cart`, cookies.token).then(data => {
             if(data?.success){
                 setCart(data.cartItems);
             }
@@ -40,7 +40,7 @@ const CartState = (props: any) => {
         try{
             const data = await request(
                 toIncrement ? REQUEST_TYPE.POST : REQUEST_TYPE.PATCH, 
-                `https://qckbie-production.up.railway.app//user/cart/${productId}`, 
+                `https://qckbuy-production.up.railway.app/api/v1//user/cart/${productId}`, 
                 cookies.token
             );
             if(data?.success){
@@ -99,7 +99,7 @@ const CartState = (props: any) => {
         try{
             const data = await request(
                 REQUEST_TYPE.DELETE, 
-                `https://qckbie-production.up.railway.app//user/cart`,
+                `https://qckbuy-production.up.railway.app/api/v1//user/cart`,
                 cookies.token
             );
             if(data?.success){

@@ -52,7 +52,9 @@ const Component = () => {
     const [totalPage, setTotalPage] = React.useState<number>(1);
  React.useEffect(() =>{
     const processor = async () => {
-        let response = await fetch(`https://qckbie-production.up.railway.app//product/?page=${currentPage}`);
+        let response = await fetch(
+          `https://qckbuy-production.up.railway.app/api/v1//product/?page=${currentPage}`
+          );
         let data = await response.json();
         setTotalPage(Math.ceil(data.totalCountProduct / data.resultPerPage));
         setProducts(data.products);
