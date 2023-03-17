@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.js": "/QckBuy-Frontend/static/js/main.931c670a.js",
+    "main.js": "/QckBuy-Frontend/static/js/main.8ed16692.js",
     "static/js/787.3b1c03a1.chunk.js": "/QckBuy-Frontend/static/js/787.3b1c03a1.chunk.js",
     "index.html": "/QckBuy-Frontend/index.html",
-    "main.931c670a.js.map": "/QckBuy-Frontend/static/js/main.931c670a.js.map",
+    "main.8ed16692.js.map": "/QckBuy-Frontend/static/js/main.8ed16692.js.map",
     "787.3b1c03a1.chunk.js.map": "/QckBuy-Frontend/static/js/787.3b1c03a1.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.931c670a.js"
+    "static/js/main.8ed16692.js"
   ]
 }
