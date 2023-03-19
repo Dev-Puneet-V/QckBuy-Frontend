@@ -29,7 +29,7 @@ const Component = (props: any) => {
     const processor = async () => {
       let data = await request(
         REQUEST_TYPE.GET,
-        `https://qckbuy-production.up.railway.app/api/v1/product/${id}`,
+        `https://qckbuyproduct.azurewebsites.net/api/v1/product/${id}`,
         cookies.token
       );
       const productInfo = data.product;

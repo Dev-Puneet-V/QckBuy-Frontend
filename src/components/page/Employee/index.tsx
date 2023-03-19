@@ -96,7 +96,7 @@ const Component = (props: any) => {
 const orderAcceptHandler = async (orderId: string, currRow: any) => {
     const data = await request(
         REQUEST_TYPE.POST,
-        `https://qckbuy-production.up.railway.app/api/v1/order/accept/${orderId}`,
+        `https://qckbuyproduct.azurewebsites.net/api/v1/order/accept/${orderId}`,
         cookies.token
     )
     if(data?.success){
@@ -117,7 +117,7 @@ const orderAcceptHandler = async (orderId: string, currRow: any) => {
 const deliveryHandler = async (orderId: string,currRow: any) => {
     const data = await request(
         REQUEST_TYPE.GET,
-        `https://qckbuy-production.up.railway.app/api/v1/order/delivery/initiate/${orderId}`,
+        `https://qckbuyproduct.azurewebsites.net/api/v1/order/delivery/initiate/${orderId}`,
         cookies.token
     );
     if(data?.success){
@@ -197,13 +197,13 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
     const profileFunction = () => {    
     }
     const availableOrdersFunction = () => {
-        getData('https://qckbuy-production.up.railway.app/api/v1/dashboard/employee/available-order', 1);     
+        getData('https://qckbuyproduct.azurewebsites.net/api/v1/dashboard/employee/available-order', 1);     
     }
     const acceptedOrdersFunction = () => {
-        getData('https://qckbuy-production.up.railway.app/api/v1/dashboard/employee/accepted-order', 2);   
+        getData('https://qckbuyproduct.azurewebsites.net/api/v1/dashboard/employee/accepted-order', 2);   
     }
     const historyFunction = () => {
-        getData('https://qckbuy-production.up.railway.app/api/v1/dashboard/employee/history', 3);       
+        getData('https://qckbuyproduct.azurewebsites.net/api/v1/dashboard/employee/history', 3);       
     }
     const otpHandler = (e: React.SyntheticEvent) =>{
         let target = e.target as HTMLInputElement;
@@ -216,7 +216,7 @@ const deliveryHandler = async (orderId: string,currRow: any) => {
         setOtpVerficationState(STATUS.PROCESSING);
         const data = await request(
             REQUEST_TYPE.POST,
-            `https://qckbuy-production.up.railway.app/api/v1/order/delivery/proceed/${orderId}`,
+            `https://qckbuyproduct.azurewebsites.net/api/v1/order/delivery/proceed/${orderId}`,
             cookies.token,
             {
                 "otp": otp
