@@ -44,6 +44,33 @@ dashboard for admin and delivery person.
     QckBuy sends email notifications to customers at
     each step of the ordering process, including order confirmation,
     updates, and delivery confirmation.
+    
+## Usage
+
+To use the QckBuy frontend, follow these steps:
+
+1. Clone the repository to your local machine.
+2. Install the necessary dependencies by running `npm install`.
+3. Start the application by running `npm start`.
+4. Open a web browser and navigate to http://localhost:3000.
+
+Once you have the application up and running, you can create an account or use one of the following test accounts to explore the platform:
+
+- Admin:
+    - Email: qckbuy.product@gmail.com
+    - Password: Puneet@123
+- Employee:
+    - Email: employee1@gmail.com
+    - Password: Puneet@123
+- User:
+    - Email: puneetverma951761@gmail.com
+    - Password: Puneet@123
+
+## Links
+
+- Backend code: https://github.com/Puneet-iner/QckBuy
+- Backend deployment: https://qckbuyproduct.azurewebsites.net/api/v1
+- Website: http://qckbuy.s3-website.ap-south-1.amazonaws.com/
 
 ### Conclusion 
 QckBuy is a feature-rich and user-friendly e-commerce
